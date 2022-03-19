@@ -10,7 +10,9 @@ const YoutubeService = {
     params.append("part", "id");
     params.append("part", "snippet");
     params.append("q", query);
-    params.append("key", "AIzaSyA08kwYPP9yxYkwXHl5FSujdCuqFFqmNUg");
+    params.append("maxResults", 15);
+    params.append("type", "video");
+    params.append("key", apikey);
 
     const config = { params, responseType };
 
