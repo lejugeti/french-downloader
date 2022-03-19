@@ -1,0 +1,34 @@
+.video-result {
+  display: flex;
+  flex-direction: row;
+  margin-top: 1em;
+}
+
+.video-informations {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding-left: 1em;
+}
+
+.video-title {
+  font-size: 1.4em;
+  font-weight: bold;
+}
+
+.video-channel {
+  color: rgb(124, 119, 119);
+  font-size: 1.2em;
+  font-weight: bold;
+  margin-top: 0.5em;
+}
+
+.video-buttons {
+  display: flex;
+}
+
+.download-btn.css-sghohy-MuiButtonBase-root-MuiButton-root,
+.download-btn.css-zcbmsk-MuiButtonBase-root-MuiButton-root {
+  width: 8em;
+  margin: 2em 1em 0 0;
+}
