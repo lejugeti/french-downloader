@@ -1,7 +1,17 @@
 .search-page {
   margin-top: 1em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.search-page TextField {
+  text-align: center;
 }
 
 .search-results {
   padding: 1em 3em 1em 3em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }

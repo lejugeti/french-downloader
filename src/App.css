@@ -1,5 +1,9 @@
-.App {
-  text-align: center;
+:root {
+  --colors-primary: #077187;
+  --colors-secondary: #074f57;
+  --colors-tertiary: #74a57f;
+  --colors-light: #9ece9a;
+  --colors-contrast: #e4c5af;
 }
 
 .App-logo {

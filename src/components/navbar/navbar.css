@@ -1,0 +1,22 @@
+.navbar-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: stretch;
+  align-items: center;
+  padding-left: 5em;
+}
+
+.navigation-link {
+  font-size: 2em;
+  color: var(--colors-primary);
+  text-decoration: none;
+  margin: 0.2em 0 0 2em;
+}
+
+.navigation-link:hover {
+  color: var(--colors-secondary);
+}
+
+.navbar-separator {
+  border-top: 2px solid var(--colors-secondary);
+}

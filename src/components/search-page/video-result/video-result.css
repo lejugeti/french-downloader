@@ -1,7 +1,9 @@
 .video-result {
   display: flex;
   flex-direction: row;
+  justify-content: stretch;
   margin-top: 1em;
+  width: 900px;
 }
 
 .video-informations {
@@ -14,6 +16,10 @@
 .video-title {
   font-size: 1.4em;
   font-weight: bold;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  width: 500px;
 }
 
 .video-channel {

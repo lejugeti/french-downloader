@@ -6,9 +6,6 @@ import YoutubeDownloadService from "../../../services/youtube-download.service";
 import "./video-result.css";
 
 const VideoResult = (props) => {
-  const [query, setQuery] = useState("");
-  const [searchResult, setSearchResult] = useState({});
-
   const { id, snippet } = props.video;
   const { thumbnails } = snippet;
 
