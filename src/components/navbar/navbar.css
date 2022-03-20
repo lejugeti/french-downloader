@@ -8,6 +8,7 @@
 
 .navigation-link {
   font-size: 2em;
+  font-weight: bold;
   color: var(--colors-primary);
   text-decoration: none;
   margin: 0.2em 0 0 2em;
