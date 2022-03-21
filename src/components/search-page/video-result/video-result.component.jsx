@@ -10,7 +10,7 @@ const VideoResult = (props) => {
   const { thumbnails } = snippet;
 
   const handleDownloadVideo = (convertToMusic) => {
-    YoutubeDownloadService.downloadVideo(id.videoId, convertToMusic)
+    YoutubeDownloadService.downloadVideo(props.video, convertToMusic)
       .then()
       .catch((error) => console.log(error));
   };

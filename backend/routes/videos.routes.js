@@ -2,15 +2,16 @@ var express = require("express");
 const queryString = require("query-string");
 
 var router = express.Router();
-var VideoController = require("../controller/videos.controller");
+var videoController = require("../controller/videos.controller");
 
-router.get("/:id/download", function (req, res, next) {
-  const videoId = req.params.id;
+router.post("/download", function (req, res, next) {
+  const video = req.body;
   const params = queryString.parse(req._parsedUrl.query, {
     parseBooleans: true,
   });
 
-  VideoController.downloadVideo(videoId, params.convertToMusic)
+  videoController
+    .downloadVideo(video, params.convertToMusic)
     .then((code) => {
       res.status(200);
       res.send("Video downloaded");

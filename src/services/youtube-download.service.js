@@ -1,16 +1,32 @@
 const axios = require("axios").default;
-const apiUrl = "http://localhost:8080/videos/";
+const apiUrl = "http://localhost:8080/videos";
 
-const YoutubeDownloadService = {
-  downloadVideo: function (videoId, convertToMusic) {
-    const downloadUrl = apiUrl + videoId + "/download";
+class YoutubeDownloadService {
+  downloadVideo(video, convertToMusic) {
+    console.log(video);
+    const downloadUrl = apiUrl + "/download";
 
     const params = new URLSearchParams();
     params.append("convertToMusic", convertToMusic);
 
-    const config = { params };
-    return axios.get(downloadUrl, config);
-  },
-};
+    const config = { params, data: this.formatVideo(video) };
+    return axios({
+      method: "post",
+      url: downloadUrl,
+      data: this.formatVideo(video),
+      params,
+    });
+  }
 
-export default YoutubeDownloadService;
+  formatVideo(video) {
+    return {
+      videoId: video.id.videoId,
+      thumbnail: video.snippet.thumbnails.medium,
+      title: video.snippet.title,
+      channelTitle: video.snippet.channelTitle,
+      channelId: video.snippet.channelId,
+    };
+  }
+}
+
+export default new YoutubeDownloadService();

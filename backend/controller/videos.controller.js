@@ -1,14 +1,17 @@
 const { spawn } = require("child_process");
+var videoDataService = require("../services/video-data.service");
+
+const youtubeUrl = "https://www.youtube.com/watch?v=";
 const libraryPaths = {
   youtubeDownload: "../lib/youtube-dl.exe",
   ffmpeg: "../lib/ffmpeg.exe",
 };
 
-const youtubeUrl = "https://www.youtube.com/watch?v=";
-
-const VideoController = {
-  downloadVideo: (videoId, convertToMusic) => {
+class VideoController {
+  downloadVideo(video, convertToMusic) {
     return new Promise((resolve, reject) => {
+      const videoId = video.videoId;
+
       console.log(
         `Download video with id=${videoId} as a ${
           convertToMusic === true ? "MUSIC" : "VIDEO"
@@ -33,23 +36,31 @@ const VideoController = {
 
       var child = spawn(command, args);
 
+      // Logs du process
       child.stdout.setEncoding("utf8");
       child.stderr.setEncoding("utf8");
       child.stdout.on("data", (data) => console.log(data));
       child.stderr.on("data", (data) => console.log(data));
 
       child.on("close", (code) => {
+        const videoData = { ...video, date: new Date().toLocaleString() };
+
         if (code === 0) {
+          videoData["error"] = false;
+          videoDataService.addVideo(videoData);
           resolve(code);
         } else {
           const error = new Error(
             `Erreur pendant le téléchargement. Code youtube-dl : ${code}.`
           );
+
+          videoData["error"] = true;
+          videoDataService.addVideoWithError(videoData);
           reject(error);
         }
       });
     });
-  },
-};
+  }
+}
 
-module.exports = VideoController;
+module.exports = new VideoController();
