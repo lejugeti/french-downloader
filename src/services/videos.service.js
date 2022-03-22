@@ -29,13 +29,27 @@ class VideosService {
   }
 
   formatVideo(video) {
-    return {
-      videoId: video.id.videoId,
-      thumbnail: video.snippet.thumbnails.medium,
-      title: video.snippet.title,
-      channelTitle: video.snippet.channelTitle,
-      channelId: video.snippet.channelId,
-    };
+    if (this.videoIsAlreadyFormated(video)) {
+      return video;
+    } else {
+      return {
+        videoId: video.id.videoId,
+        thumbnail: video.snippet.thumbnails.medium,
+        title: video.snippet.title,
+        channelTitle: video.snippet.channelTitle,
+        channelId: video.snippet.channelId,
+      };
+    }
+  }
+
+  videoIsAlreadyFormated(video) {
+    return (
+      video.hasOwnProperty("videoId") &&
+      video.hasOwnProperty("thumbnail") &&
+      video.hasOwnProperty("title") &&
+      video.hasOwnProperty("channelTitle") &&
+      video.hasOwnProperty("channelId")
+    );
   }
 }
 

@@ -13,7 +13,7 @@ const VideoDownload = (props) => {
 
   const handleDownloadVideo = (convertToMusic) => {
     VideosService.downloadVideo(props.video, convertToMusic)
-      .then()
+      .then(() => props.onDownloadVideo())
       .catch((error) => console.log(error));
   };
 
