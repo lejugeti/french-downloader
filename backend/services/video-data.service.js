@@ -9,6 +9,10 @@ class VideoDataService {
     this.readData();
   }
 
+  getVideos() {
+    return JSON.stringify(this.data);
+  }
+
   addVideo(video) {
     this.data = this.filterVideosWithError(video.id);
     this.data.push(video);

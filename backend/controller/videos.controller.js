@@ -8,6 +8,10 @@ const libraryPaths = {
 };
 
 class VideoController {
+  getVideosDownloaded() {
+    return videoDataService.getVideos();
+  }
+
   downloadVideo(video, convertToMusic) {
     return new Promise((resolve, reject) => {
       const videoId = video.videoId;

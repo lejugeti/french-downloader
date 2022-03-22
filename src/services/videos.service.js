@@ -1,9 +1,19 @@
 const axios = require("axios").default;
 const apiUrl = "http://localhost:8080/videos";
 
-class YoutubeDownloadService {
+class VideosService {
+  async getVideosDownloaded() {
+    const downloadUrl = apiUrl;
+
+    const result = await axios({
+      method: "get",
+      url: downloadUrl,
+    });
+
+    return result.data;
+  }
+
   downloadVideo(video, convertToMusic) {
-    console.log(video);
     const downloadUrl = apiUrl + "/download";
 
     const params = new URLSearchParams();
@@ -29,4 +39,4 @@ class YoutubeDownloadService {
   }
 }
 
-export default new YoutubeDownloadService();
+export default new VideosService();

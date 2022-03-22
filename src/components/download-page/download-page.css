@@ -1,0 +1,17 @@
+.download-page {
+  margin-top: 1em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.download-page TextField {
+  text-align: center;
+}
+
+.download-results {
+  padding: 1em 3em 1em 3em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}

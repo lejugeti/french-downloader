@@ -1,15 +1,21 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { TextField } from "@mui/material";
 import InputAdornment from "@mui/material/InputAdornment";
 import SearchIcon from "@mui/icons-material/Search";
-import VideoResult from "./video-result/video-result.component";
+import VideoDownload from "./video-download/video-download.component";
+import videosService from "../../services/videos.service";
 
-import "./search-page.css";
-import YoutubeService from "../../services/youtube.service";
+import "./download-page.css";
 
-const SearchPage = function (props) {
-  const [query, setQuery] = useState("");
+const DownloadPage = function (props) {
+  const [videosDownloaded, setVideosDownloaded] = useState([]);
   const [searchResult, setSearchResult] = useState([]);
+
+  useEffect(() => {
+    videosService.getVideosDownloaded().then((videos) => {
+      setVideosDownloaded(videos);
+    });
+  }, []);
 
   const searchVideos = (query) => {
     if (query !== "") {
@@ -29,7 +35,7 @@ const SearchPage = function (props) {
   };
 
   return (
-    <div className='search-page'>
+    <div className='download-page'>
       <TextField
         id='outlined-basic'
         label='Recherche'
@@ -45,13 +51,13 @@ const SearchPage = function (props) {
         onChange={(newQuery) => setQuery(newQuery.target.value)}
         onKeyDown={handleEnterKeySearch}
       />
-      <div className='search-results'>
-        {searchResult.map((video) => (
-          <VideoResult key={video.id.videoId} video={video} />
+      <div className='download-results'>
+        {videosDownloaded.map((video, index) => (
+          <VideoDownload key={index} video={video} />
         ))}
       </div>
     </div>
   );
 };
 
-export default SearchPage;
+export default DownloadPage;

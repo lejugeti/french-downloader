@@ -4,6 +4,12 @@ const queryString = require("query-string");
 var router = express.Router();
 var videoController = require("../controller/videos.controller");
 
+router.get("/", function (req, res, next) {
+  const videos = videoController.getVideosDownloaded();
+  res.status(200);
+  res.send(videos);
+});
+
 router.post("/download", function (req, res, next) {
   const video = req.body;
   const params = queryString.parse(req._parsedUrl.query, {
@@ -17,8 +23,7 @@ router.post("/download", function (req, res, next) {
       res.send("Video downloaded");
     })
     .catch((error) => {
-      res.status(500);
-      res.send(error.message);
+      next(error);
     });
 });
 

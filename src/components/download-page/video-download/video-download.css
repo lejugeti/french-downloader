@@ -1,0 +1,63 @@
+.video-download {
+  display: flex;
+  flex-direction: row;
+  justify-content: stretch;
+  margin-top: 2em;
+  width: 900px;
+}
+
+.video-informations {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding-left: 1em;
+}
+
+.video-title {
+  font-size: 1.4em;
+  font-weight: bold;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  width: 500px;
+}
+
+.video-channel {
+  color: rgb(124, 119, 119);
+  font-size: 1.2em;
+  font-weight: bold;
+  margin-top: 0.5em;
+}
+
+/* DOWNLOAD INFORMATIONS */
+
+.download-informations {
+  margin-top: 1em;
+}
+
+.download-status-OK,
+.download-status-ERROR {
+  display: flex;
+  align-items: flex-end;
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
+.download-status-OK {
+  color: green;
+}
+
+.download-status-ERROR {
+  color: rgb(185, 8, 8);
+}
+
+/* DOWNLOAD BUTTONS */
+.video-buttons {
+  display: flex;
+}
+
+.download-btn.css-sghohy-MuiButtonBase-root-MuiButton-root,
+.download-btn.css-zcbmsk-MuiButtonBase-root-MuiButton-root {
+  width: 8em;
+  margin: 1em 1em 0 0;
+}

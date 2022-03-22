@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Button } from "@mui/material";
 import DownloadIcon from "@mui/icons-material/Download";
-import YoutubeDownloadService from "../../../services/youtube-download.service";
+import YoutubeDownloadService from "../../../services/videos.service";
 
 import "./video-result.css";
 
