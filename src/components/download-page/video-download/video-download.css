@@ -57,7 +57,9 @@
 }
 
 .download-btn.css-sghohy-MuiButtonBase-root-MuiButton-root,
-.download-btn.css-zcbmsk-MuiButtonBase-root-MuiButton-root {
+.download-btn.css-zcbmsk-MuiButtonBase-root-MuiButton-root,
+.delete-btn.css-wnpvqa-MuiButtonBase-root-MuiButton-root {
+  height: 2.8em;
   width: 8em;
   margin: 1em 1em 0 0;
 }

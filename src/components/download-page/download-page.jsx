@@ -57,7 +57,12 @@ const DownloadPage = function (props) {
       />
       <div className='download-results'>
         {videosDownloaded.map((video, index) => (
-          <VideoDownload key={index} video={video} onDownloadVideo={refreshVideosDownloaded} />
+          <VideoDownload
+            key={index}
+            video={video}
+            onDownloadVideo={refreshVideosDownloaded}
+            onDeleteVideo={refreshVideosDownloaded}
+          />
         ))}
       </div>
     </div>

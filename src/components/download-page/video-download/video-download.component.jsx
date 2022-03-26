@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React from "react";
 import { Button } from "@mui/material";
 import DownloadIcon from "@mui/icons-material/Download";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ErrorIcon from "@mui/icons-material/Error";
+import CancelIcon from "@mui/icons-material/Cancel";
 import VideosService from "../../../services/videos.service";
 
 import "./video-download.css";
@@ -15,6 +16,16 @@ const VideoDownload = (props) => {
     VideosService.downloadVideo(props.video, convertToMusic)
       .then(() => props.onDownloadVideo())
       .catch((error) => console.log(error));
+  };
+
+  const handleDeleteVideoDownloaded = async () => {
+    const status = await VideosService.deleteVideo(video);
+
+    if (status == 200) {
+      props.onDeleteVideo();
+    } else {
+      alert(`Error while deleting video : ${video.title}`);
+    }
   };
 
   const renderDownloadStatus = () => {
@@ -69,6 +80,10 @@ const VideoDownload = (props) => {
             onClick={() => handleDownloadVideo(false)}>
             <DownloadIcon />
             <span>Vidéo</span>
+          </Button>
+          <Button variant='outlined' color='secondary' className='delete-btn' onClick={handleDeleteVideoDownloaded}>
+            <CancelIcon />
+            <span>Delete</span>
           </Button>
         </div>
       </div>

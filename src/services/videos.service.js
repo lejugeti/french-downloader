@@ -3,14 +3,27 @@ const apiUrl = "http://localhost:8080/videos";
 
 class VideosService {
   async getVideosDownloaded() {
-    const downloadUrl = apiUrl;
-
     const result = await axios({
       method: "get",
-      url: downloadUrl,
+      url: apiUrl,
     });
 
     return result.data;
+  }
+
+  async deleteVideo(video) {
+    const params = {
+      videoId: video.videoId,
+      date: video.date,
+    };
+
+    const result = await axios({
+      method: "delete",
+      url: apiUrl,
+      params,
+    });
+
+    return result.status;
   }
 
   downloadVideo(video, convertToMusic) {
