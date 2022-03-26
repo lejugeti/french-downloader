@@ -14,7 +14,7 @@ class VideoDataService {
   }
 
   getVideosAsString() {
-    return JSON.stringify(this.data);
+    return JSON.stringify(this.videos);
   }
 
   addVideo(video) {
