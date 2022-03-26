@@ -2,7 +2,7 @@ var express = require("express");
 const queryString = require("query-string");
 
 var router = express.Router();
-var videoController = require("../controller/videos.controller");
+var videoController = require("../controllers/videos.controller");
 
 router.get("/", function (req, res, next) {
   const videos = videoController.getVideosDownloaded();
