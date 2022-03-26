@@ -27,4 +27,16 @@ router.post("/download", function (req, res, next) {
     });
 });
 
+router.delete("/", function (req, res, next) {
+  const params = req.query;
+
+  videoController
+    .deleteVideo(params.videoId, params.date)
+    .then(() => {
+      res.status(200);
+      res.send();
+    })
+    .catch((error) => next(error));
+});
+
 module.exports = router;

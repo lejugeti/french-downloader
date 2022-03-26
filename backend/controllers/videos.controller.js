@@ -14,7 +14,7 @@ class VideoController {
   timePattern = /(?<=ETA )\d{2}:\d{2}/;
 
   getVideosDownloaded() {
-    return videoDataService.getVideos();
+    return videoDataService.getVideosAsString();
   }
 
   downloadVideo(video, convertToMusic, nbRetry) {
@@ -90,6 +90,17 @@ class VideoController {
       });
 
       child.on("close", (code) => resolve(httpErrorCode || code));
+    });
+  }
+
+  deleteVideo(videoId, date) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        await videoDataService.removeVideo(videoId, date);
+        resolve();
+      } catch (error) {
+        reject(error);
+      }
     });
   }
 

@@ -2,7 +2,7 @@ const fs = require("fs");
 const path = require("path");
 
 class VideoDataService {
-  data = [];
+  videos = [];
   dataPath = "./data/videos.json";
 
   constructor() {
@@ -10,19 +10,34 @@ class VideoDataService {
   }
 
   getVideos() {
+    return this.videos;
+  }
+
+  getVideosAsString() {
     return JSON.stringify(this.data);
   }
 
   addVideo(video) {
-    this.data = this.filterVideosWithError(video.id);
-    this.data.push(video);
+    this.videos = this.filterVideosWithError(video.id);
+    this.videos.push(video);
     this.saveData();
   }
 
   addVideoWithError(video) {
-    this.data = this.filterVideosWithError(video.id);
-    this.data.push(video);
+    this.videos = this.filterVideosWithError(video.id);
+    this.videos.push(video);
     this.saveData();
+  }
+
+  removeVideo(videoId, date) {
+    const videoIndex = this.videos.findIndex((video) => video.videoId === videoId && video.date === date);
+
+    if (videoIndex != -1) {
+      this.videos.splice(videoIndex, 1);
+      this.saveData();
+    } else {
+      throw new Error("Aucune vidéo présente en mémoire");
+    }
   }
 
   saveData() {
@@ -30,36 +45,29 @@ class VideoDataService {
   }
 
   filterVideosWithError(videoId) {
-    return this.data.filter(
-      (vid) => vid.id !== videoId || (vid.id === videoId && vid.error == false)
-    );
+    return this.videos.filter((vid) => vid.id !== videoId || (vid.id === videoId && vid.error == false));
   }
 
   //#region manipulate data file
   createDataFile() {
-    this.data = [];
+    this.videos = [];
     this.writeData();
   }
 
   readData() {
     fs.readFile(this.dataPath, "utf8", (err, videosData) => {
       if (err && err.code === "ENOENT") {
-        console.log(
-          `Creating new videos data file at ${path.join(
-            __dirname,
-            this.dataPath
-          )}`
-        );
+        console.log(`Creating new videos data file at ${path.join(__dirname, this.dataPath)}`);
 
         this.createDataFile();
       } else {
-        this.data = JSON.parse(videosData);
+        this.videos = JSON.parse(videosData);
       }
     });
   }
 
   writeData() {
-    fs.writeFile(this.dataPath, JSON.stringify(this.data), (err) => {
+    fs.writeFile(this.dataPath, JSON.stringify(this.getVideos()), (err) => {
       if (err) {
         console.error(err);
       }
