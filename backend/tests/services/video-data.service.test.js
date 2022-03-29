@@ -19,4 +19,24 @@ describe("Video data service", () => {
 
     expect(() => videoDataService.removeVideo("videoId3", "2022-3-26 18:05:45")).toThrow();
   });
+
+  test("Get videos", () => {
+    videoDataService.videos = [
+      { id: 0, videoId: "videoId", date: "2022-3-26 18:05:46", error: false },
+      { id: 1, videoId: "videoId", date: "2022-3-26 18:05:45", error: false },
+      { id: 2, videoId: "videoId2", date: "2022-3-26 18:05:45", error: false },
+    ];
+
+    expect(videoDataService.getVideos().length).toBe(3);
+  });
+
+  test("Get new video id", () => {
+    videoDataService.videos = [
+      { id: 0, videoId: "videoId", date: "2022-3-26 18:05:46", error: false },
+      { id: 1, videoId: "videoId", date: "2022-3-26 18:05:45", error: false },
+      { id: 2, videoId: "videoId2", date: "2022-3-26 18:05:45", error: false },
+    ];
+
+    expect(videoDataService.getNewId()).toBe(3);
+  });
 });
