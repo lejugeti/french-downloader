@@ -1,5 +1,6 @@
 const { spawn } = require("child_process");
 var videoDataService = require("../services/video-data.service");
+var SocketService = require("../services/socket.service");
 
 const youtubeUrl = "https://www.youtube.com/watch?v=";
 const libraryPaths = {
@@ -79,17 +80,28 @@ class VideoController {
       }
 
       var child = spawn(command, args);
+      var socket = SocketService.createSocket(9000);
+      socket.on("connection_error", (err) => console.log(error));
 
       // Logs du process
       child.stdout.setEncoding("utf8");
       child.stderr.setEncoding("utf8");
-      child.stdout.on("data", (data) => console.log(data));
+      child.stdout.on("data", (data) => {
+        console.log(data);
+        if (this.isDownloadInfos(data)) {
+          socket.emit("downloadInfos", this.parseDownloadPercentage(data), this.parseDownloadTime(data));
+        }
+      });
+
       child.stderr.on("data", (errorData) => {
         console.log(errorData);
         httpErrorCode = this.parseHttpErrorCode(errorData) || httpErrorCode;
       });
 
-      child.on("close", (code) => resolve(httpErrorCode || code));
+      child.on("close", (code) => {
+        socket.close();
+        resolve(httpErrorCode || code);
+      });
     });
   }
 
@@ -102,6 +114,10 @@ class VideoController {
         reject(error);
       }
     });
+  }
+
+  isDownloadInfos(logLine) {
+    return this.percentagePattern.test(logLine) || this.timePattern.test(logLine);
   }
 
   parseDownloadPercentage(logLine) {

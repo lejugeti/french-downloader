@@ -62,28 +62,28 @@ describe("Video controller", () => {
   });
 
   test("Parse percentage", () => {
+    expect(videoController.parseDownloadPercentage("68.5% of total video")).toBe("68.5%");
     expect(videoController.parseDownloadPercentage("[download]  68.5% of total video")).toBe("68.5%");
-
     expect(videoController.parseDownloadPercentage("[download]  62.55% of total video")).toBe("62.55%");
-
     expect(videoController.parseDownloadPercentage("[download]  62.% of total video")).toBe("62.%");
-
     expect(videoController.parseDownloadPercentage("[download] of total video")).toBe(null);
   });
 
   test("Parse http code", () => {
     expect(videoController.parseHttpErrorCode("HTTP 403")).toBe(403);
-
     expect(videoController.parseHttpErrorCode("HTTP 403 video")).toBe(403);
-
     expect(videoController.parseHttpErrorCode("[download]  403.110 of total video")).toBe(null);
   });
 
   test("Parse download time", () => {
     expect(videoController.parseDownloadTime("52.24KiB/s ETA 00:03")).toBe("00:03");
-
     expect(videoController.parseDownloadTime("52.24KiB/s ETA 00:03 ")).toBe("00:03");
-
     expect(videoController.parseDownloadTime("52.24KiB/s ETA 100:03")).toBe(null);
+  });
+
+  test("Is download informations", () => {
+    expect(videoController.isDownloadInfos("52.24KiB/s ETA 00:03")).toBeTruthy();
+    expect(videoController.isDownloadInfos("68.5% blabla ")).toBeTruthy();
+    expect(videoController.isDownloadInfos("52.24KiB/s ETA 100")).toBeFalsy();
   });
 });
