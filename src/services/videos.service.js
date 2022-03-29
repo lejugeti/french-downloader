@@ -33,7 +33,7 @@ class VideosService {
     params.append("convertToMusic", convertToMusic);
 
     const config = { params, data: this.formatVideo(video) };
-    console.log({ videoSent: this.formatVideo(video), video });
+
     return axios({
       method: "post",
       url: downloadUrl,
