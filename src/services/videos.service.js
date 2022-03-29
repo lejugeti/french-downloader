@@ -33,6 +33,7 @@ class VideosService {
     params.append("convertToMusic", convertToMusic);
 
     const config = { params, data: this.formatVideo(video) };
+    console.log({ videoSent: this.formatVideo(video), video });
     return axios({
       method: "post",
       url: downloadUrl,
@@ -42,8 +43,14 @@ class VideosService {
   }
 
   formatVideo(video) {
-    if (this.videoIsAlreadyFormated(video)) {
-      return video;
+    if (this.videoIsNotRaw(video)) {
+      return {
+        videoId: video.videoId,
+        thumbnail: video.thumbnail,
+        title: video.title,
+        channelTitle: video.channelTitle,
+        channelId: video.channelId,
+      };
     } else {
       return {
         videoId: video.id.videoId,
@@ -55,7 +62,7 @@ class VideosService {
     }
   }
 
-  videoIsAlreadyFormated(video) {
+  videoIsNotRaw(video) {
     return (
       video.hasOwnProperty("videoId") &&
       video.hasOwnProperty("thumbnail") &&

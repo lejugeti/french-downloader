@@ -22,13 +22,13 @@ class VideoDataService {
   }
 
   addVideo(video) {
-    this.videos = this.filterVideosWithError(video.id);
+    this.videos = this.filterVideosWithError(video.videoId);
     this.videos.push(video);
     this.saveData();
   }
 
   addVideoWithError(video) {
-    this.videos = this.filterVideosWithError(video.id);
+    this.videos = this.filterVideosWithError(video.videoId);
     this.videos.push(video);
     this.saveData();
   }
@@ -49,7 +49,7 @@ class VideoDataService {
   }
 
   filterVideosWithError(videoId) {
-    return this.videos.filter((vid) => vid.id !== videoId || (vid.id === videoId && vid.error == false));
+    return this.videos.filter((vid) => vid.videoId !== videoId || (vid.videoId === videoId && vid.error == false));
   }
 
   //#region manipulate data file
