@@ -19,14 +19,17 @@ class VideoController {
   }
 
   handleDownloadVideo(video, convertToMusic) {
-    videoDataService.addVideo({
+    const videoToDownload = {
       id: videoDataService.getNewId(),
       ...video,
       date: new Date().toLocaleString(),
       error: false,
-    });
+    };
 
+    videoDataService.addVideo(videoToDownload);
     this.downloadVideo(video, convertToMusic, 0);
+
+    return videoToDownload;
   }
 
   downloadVideo(video, convertToMusic, nbRetry) {

@@ -17,9 +17,9 @@ router.post("/download", function (req, res, next) {
   });
 
   try {
-    videoController.handleDownloadVideo(video, params.convertToMusic);
+    const videoDownloading = videoController.handleDownloadVideo(video, params.convertToMusic);
     res.status(200);
-    res.send("Video is downloading");
+    res.send(videoDownloading);
   } catch (error) {
     next(error);
   }
