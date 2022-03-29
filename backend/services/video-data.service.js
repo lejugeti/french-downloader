@@ -9,6 +9,10 @@ class VideoDataService {
     this.readData();
   }
 
+  getNewId() {
+    return this.videos.length != 0 ? Math.max(this.getVideos().map((video) => video.id)) + 1 : 0;
+  }
+
   getVideos() {
     return this.videos;
   }

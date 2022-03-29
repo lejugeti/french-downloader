@@ -16,15 +16,13 @@ router.post("/download", function (req, res, next) {
     parseBooleans: true,
   });
 
-  videoController
-    .downloadVideo(video, params.convertToMusic)
-    .then((code) => {
-      res.status(200);
-      res.send("Video downloaded");
-    })
-    .catch((error) => {
-      next(error);
-    });
+  try {
+    videoController.handleDownloadVideo(video, params.convertToMusic);
+    res.status(200);
+    res.send("Video is downloading");
+  } catch (error) {
+    next(error);
+  }
 });
 
 router.delete("/", function (req, res, next) {

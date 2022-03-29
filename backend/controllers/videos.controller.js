@@ -18,6 +18,17 @@ class VideoController {
     return videoDataService.getVideosAsString();
   }
 
+  handleDownloadVideo(video, convertToMusic) {
+    videoDataService.addVideo({
+      id: videoDataService.getNewId(),
+      ...video,
+      date: new Date().toLocaleString(),
+      error: false,
+    });
+
+    this.downloadVideo(video, convertToMusic, 0);
+  }
+
   downloadVideo(video, convertToMusic, nbRetry) {
     return new Promise(async (resolve, reject) => {
       var code = await this.spawnDownloadScript(video, convertToMusic);
@@ -36,12 +47,6 @@ class VideoController {
       }
 
       if (code === 0) {
-        videoDataService.addVideo({
-          ...video,
-          date: new Date().toLocaleString(),
-          error: false,
-        });
-
         resolve(code);
         return;
       } else {
