@@ -6,12 +6,12 @@ import { Outlet } from "react-router-dom";
 import { useState } from "react";
 
 function App() {
-  var [currentVideoId, setVideoDownloadingId] = useState(null);
+  var [currentVideoKeyId, setVideoDownloadingId] = useState(null);
 
   const updateVideoDownloading = (videoId) => setVideoDownloadingId(videoId);
   const resetVideoDownloading = () => setVideoDownloadingId(null);
 
-  const videoDownloadingContextValue = { currentVideoId, updateVideoDownloading, resetVideoDownloading };
+  const videoDownloadingContextValue = { currentVideoKeyId, updateVideoDownloading, resetVideoDownloading };
 
   return (
     <VideoDownloadingContext.Provider value={videoDownloadingContextValue}>

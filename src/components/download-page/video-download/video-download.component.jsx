@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { Button } from "@mui/material";
 import DownloadIcon from "@mui/icons-material/Download";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
@@ -13,18 +13,26 @@ import "./video-download.css";
 const VideoDownload = (props) => {
   const { video } = props;
   const { thumbnail } = video;
-  var socket;
 
   var videoContext = useContext(VideoDownloadingContext);
+  var [socketDownload, setSocketDownload] = useState();
   var [percentageDownload, setPercentageDownload] = useState();
   var [timeDownload, setTimeDownload] = useState();
 
-  const handleDownloadVideo = (convertToMusic) => {
-    socket = socketService.createServer();
+  useEffect(() => {
+    if (videoContext.currentVideoKeyId === video.id) {
+      openDownloadSocket();
+    }
+  }, [videoContext.currentVideoKeyId]);
+
+  const openDownloadSocket = () => {
+    var socket = socketService.createServer();
+
     socket.on("connection_error", (err) => console.log(error));
     socket.on("disconnect", () => {
       socket.close();
-      socket = null;
+      setSocketDownload(null);
+      videoContext.resetVideoDownloading();
     });
     socket.on("downloadInfos", (percentageDownloadData, timeDownloadData) => {
       console.log({ percentageDownloadData, timeDownloadData });
@@ -32,8 +40,13 @@ const VideoDownload = (props) => {
       setTimeDownload(timeDownloadData);
     });
 
+    setSocketDownload(socket);
+  };
+
+  const handleDownloadVideo = (convertToMusic) => {
     VideosService.downloadVideo(props.video, convertToMusic)
-      .then(() => {
+      .then((videoDownloading) => {
+        videoContext.updateVideoDownloading(videoDownloading.id);
         props.onDownloadVideo();
       })
       .catch((error) => {
@@ -71,6 +84,7 @@ const VideoDownload = (props) => {
 
   return (
     <div className='video-download'>
+      {percentageDownload} - {timeDownload}
       <img
         className='video-thumbnail'
         style={{

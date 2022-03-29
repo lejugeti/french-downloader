@@ -26,7 +26,7 @@ class VideosService {
     return result.status;
   }
 
-  downloadVideo(video, convertToMusic) {
+  async downloadVideo(video, convertToMusic) {
     const downloadUrl = apiUrl + "/download";
 
     const params = new URLSearchParams();
@@ -34,12 +34,14 @@ class VideosService {
 
     const config = { params, data: this.formatVideo(video) };
 
-    return axios({
+    var response = await axios({
       method: "post",
       url: downloadUrl,
       data: this.formatVideo(video),
       params,
     });
+
+    return response.data;
   }
 
   formatVideo(video) {
