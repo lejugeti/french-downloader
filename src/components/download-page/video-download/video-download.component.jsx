@@ -8,22 +8,63 @@ import VideosService from "../../../services/videos.service";
 import VideoDownloadingContext from "../../../contexts/video-downloading.context";
 import socketService from "../../../services/socket.service";
 
+import DownloadProgress from "../../download-progress/download-progress.component";
+import DownloadStatus from "../../download-status/download-status.component";
+
 import "./video-download.css";
 
 const VideoDownload = (props) => {
   const { video } = props;
   const { thumbnail } = video;
 
+  var _isMounted = true;
   var videoContext = useContext(VideoDownloadingContext);
   var [socketDownload, setSocketDownload] = useState();
   var [percentageDownload, setPercentageDownload] = useState();
   var [timeDownload, setTimeDownload] = useState();
+  var [downloadError, setDownloadError] = useState(false);
 
   useEffect(() => {
-    if (videoContext.currentVideoKeyId === video.id) {
+    if (videoContext.currentVideoDownloading.id === video.id) {
       openDownloadSocket();
     }
-  }, [videoContext.currentVideoKeyId]);
+
+    return function cleanup() {
+      _isMounted = false;
+    };
+  }, []);
+
+  //#region Setters safe
+  const setSocketDownloadSafe = (socket) => {
+    if (_isMounted) {
+      setSocketDownload(socket);
+    }
+  };
+
+  const setPercentageDownloadSafe = (percentage) => {
+    if (_isMounted) {
+      setPercentageDownload(percentage);
+    }
+  };
+
+  const setTimeDownloadSafe = (time) => {
+    if (_isMounted) {
+      setTimeDownload(time);
+    }
+  };
+
+  const setDownloadDateSafe = (date) => {
+    if (_isMounted) {
+      setDownloadDate(date);
+    }
+  };
+
+  const setDownloadErrorSafe = (error) => {
+    if (_isMounted) {
+      setDownloadError(error);
+    }
+  };
+  //#endregion
 
   const openDownloadSocket = () => {
     var socket = socketService.createServer();
@@ -31,23 +72,24 @@ const VideoDownload = (props) => {
     socket.on("connection_error", (err) => console.log(error));
     socket.on("disconnect", () => {
       socket.close();
-      setSocketDownload(null);
+      setSocketDownloadSafe(null);
       videoContext.resetVideoDownloading();
     });
     socket.on("downloadInfos", (percentageDownloadData, timeDownloadData) => {
       console.log({ percentageDownloadData, timeDownloadData });
-      setPercentageDownload(percentageDownloadData);
-      setTimeDownload(timeDownloadData);
+      setPercentageDownloadSafe(percentageDownloadData);
+      setTimeDownloadSafe(timeDownloadData);
     });
 
-    setSocketDownload(socket);
+    setSocketDownloadSafe(socket);
   };
 
   const handleDownloadVideo = (convertToMusic) => {
     VideosService.downloadVideo(props.video, convertToMusic)
       .then((videoDownloading) => {
-        videoContext.updateVideoDownloading(videoDownloading.id);
+        videoContext.updateVideoDownloading(videoDownloading.id, videoDownloading.videoId);
         props.onDownloadVideo();
+        setDownloadErrorSafe(videoDownloading.error);
       })
       .catch((error) => {
         console.log(error);
@@ -68,38 +110,6 @@ const VideoDownload = (props) => {
     return socketDownload !== null && socketDownload !== undefined;
   };
 
-  const renderDownloadStatus = () => {
-    if (video.error) {
-      return (
-        <div>
-          <span className='download-status-ERROR'>
-            Download Error
-            <ErrorIcon />
-          </span>
-          <span className='download-date'>{video.date}</span>
-        </div>
-      );
-    } else {
-      return (
-        <div>
-          <span className='download-status-OK'>
-            Download Success
-            <CheckCircleIcon />
-          </span>
-          <span className='download-date'>{video.date}</span>
-        </div>
-      );
-    }
-  };
-
-  const renderDownloadProgress = () => {
-    return (
-      <div>
-        <span>{percentageDownload}</span> - <span>{timeDownload}</span>
-      </div>
-    );
-  };
-
   return (
     <div className='video-download'>
       <img
@@ -114,7 +124,11 @@ const VideoDownload = (props) => {
         <span className='video-title'>{video.title}</span>
         <span className='video-channel'>{video.channelTitle}</span>
         <div className='download-informations'>
-          {videoIsDownloading() ? renderDownloadProgress() : renderDownloadStatus()}
+          {videoIsDownloading() ? (
+            <DownloadProgress percentageDownload={percentageDownload} timeDownload={timeDownload} />
+          ) : (
+            <DownloadStatus downloadDate={video.date} downloadError={downloadError} />
+          )}
         </div>
 
         <div className='video-buttons'>
