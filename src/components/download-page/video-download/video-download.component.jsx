@@ -64,27 +64,44 @@ const VideoDownload = (props) => {
     }
   };
 
+  const videoIsDownloading = () => {
+    return socketDownload !== null && socketDownload !== undefined;
+  };
+
   const renderDownloadStatus = () => {
     if (video.error) {
       return (
-        <span className='download-status-ERROR'>
-          Download Error
-          <ErrorIcon />
-        </span>
+        <div>
+          <span className='download-status-ERROR'>
+            Download Error
+            <ErrorIcon />
+          </span>
+          <span className='download-date'>{video.date}</span>
+        </div>
       );
     } else {
       return (
-        <span className='download-status-OK'>
-          Download Success
-          <CheckCircleIcon />
-        </span>
+        <div>
+          <span className='download-status-OK'>
+            Download Success
+            <CheckCircleIcon />
+          </span>
+          <span className='download-date'>{video.date}</span>
+        </div>
       );
     }
   };
 
+  const renderDownloadProgress = () => {
+    return (
+      <div>
+        <span>{percentageDownload}</span> - <span>{timeDownload}</span>
+      </div>
+    );
+  };
+
   return (
     <div className='video-download'>
-      {percentageDownload} - {timeDownload}
       <img
         className='video-thumbnail'
         style={{
@@ -97,8 +114,7 @@ const VideoDownload = (props) => {
         <span className='video-title'>{video.title}</span>
         <span className='video-channel'>{video.channelTitle}</span>
         <div className='download-informations'>
-          {renderDownloadStatus()}
-          <span className='download-date'>{video.date}</span>
+          {videoIsDownloading() ? renderDownloadProgress() : renderDownloadStatus()}
         </div>
 
         <div className='video-buttons'>
