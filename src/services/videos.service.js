@@ -1,4 +1,5 @@
 const axios = require("axios").default;
+const qs = require("qs");
 const apiUrl = "http://localhost:8080/videos";
 
 class VideosService {
@@ -6,6 +7,35 @@ class VideosService {
     const result = await axios({
       method: "get",
       url: apiUrl,
+    });
+
+    return result.data;
+  }
+
+  async deleteVideo(video) {
+    const params = {
+      videoId: video.videoId,
+      date: video.date,
+    };
+
+    const result = await axios({
+      method: "delete",
+      url: apiUrl,
+      params,
+    });
+
+    return result.status;
+  }
+
+  async getVideosDownloadedFilteredById(videoIdList) {
+    const params = { videoIdList };
+    const result = await axios({
+      method: "get",
+      url: apiUrl,
+      params,
+      paramsSerializer: (params) => {
+        return qs.stringify(params);
+      },
     });
 
     return result.data;

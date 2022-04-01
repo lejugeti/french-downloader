@@ -10,6 +10,18 @@ router.get("/", function (req, res, next) {
   res.send(videos);
 });
 
+router.get("/filtered-by-id", function (req, res, next) {
+  const videoIdList = req.query.videoIdList;
+
+  try {
+    const videoDownloaded = videoController.getVideosDownloadedFilter(videoIdList);
+    res.status(200);
+    res.send(videoDownloaded);
+  } catch (error) {
+    next(error);
+  }
+});
+
 router.post("/download", function (req, res, next) {
   const video = req.body;
   const params = queryString.parse(req._parsedUrl.query, {

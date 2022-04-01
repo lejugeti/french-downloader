@@ -21,6 +21,10 @@ class VideoDataService {
     return JSON.stringify(this.videos);
   }
 
+  getVideosFiltered(videoIdList) {
+    return this.videos.filter((video) => videoIdList.includes(video.videoId));
+  }
+
   addVideo(video) {
     this.videos = this.filterVideosWithError(video.videoId);
     this.videos.push(video);

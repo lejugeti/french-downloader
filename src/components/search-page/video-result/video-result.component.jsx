@@ -10,8 +10,8 @@ import DownloadStatus from "../../download-status/download-status.component";
 
 import "./video-result.css";
 
-const VideoResult = (props) => {
-  const { id, snippet } = props.video;
+const VideoResult = ({ video, alreadyDownloaded }) => {
+  const { id, snippet } = video;
   const { thumbnails } = snippet;
 
   var _isMounted = true;
@@ -23,7 +23,7 @@ const VideoResult = (props) => {
   var [downloadDate, setDownloadDate] = useState("");
 
   useEffect(() => {
-    if (videoContext.currentVideoDownloading.videoId === props.video.videoId) {
+    if (videoContext.currentVideoDownloading.videoId === video.videoId) {
       openDownloadSocket();
     }
 
@@ -66,7 +66,7 @@ const VideoResult = (props) => {
   //#endregion
 
   const handleDownloadVideo = (convertToMusic) => {
-    YoutubeDownloadService.downloadVideo(props.video, convertToMusic)
+    YoutubeDownloadService.downloadVideo(video, convertToMusic)
       .then((videoDownloading) => {
         videoContext.updateVideoDownloading(videoDownloading.id, videoDownloading.videoId);
         openDownloadSocket();
@@ -99,6 +99,11 @@ const VideoResult = (props) => {
     return socketDownload !== null && socketDownload !== undefined;
   };
 
+  const showDownloadStatus = () => {
+    // console.log({ downloading: videoIsDownloading(), alreadyDownloaded });
+    return !videoIsDownloading() && alreadyDownloaded;
+  };
+
   return (
     <div className='video-result'>
       <img
@@ -114,11 +119,10 @@ const VideoResult = (props) => {
         <span className='video-channel'>{snippet.channelTitle}</span>
 
         <div className='download-informations'>
-          {videoIsDownloading() ? (
+          {videoIsDownloading() && (
             <DownloadProgress percentageDownload={percentageDownload} timeDownload={timeDownload} />
-          ) : (
-            <DownloadStatus downloadDate={downloadDate} downloadError={downloadError} />
           )}
+          {showDownloadStatus() && <DownloadStatus downloadDate={downloadDate} downloadError={downloadError} />}
         </div>
 
         <div className='video-buttons'>

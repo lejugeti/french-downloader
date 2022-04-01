@@ -15,7 +15,11 @@ class VideoController {
   timePattern = /(?<=ETA )\d{2}:\d{2}/;
 
   getVideosDownloaded() {
-    return videoDataService.getVideosAsString();
+    return videoDataService.getVideos();
+  }
+
+  getVideosDownloadedFilter(videoIdList) {
+    return videoDataService.getVideosFiltered(videoIdList);
   }
 
   handleDownloadVideo(video, convertToMusic) {
