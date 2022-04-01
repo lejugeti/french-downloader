@@ -38,36 +38,43 @@ class VideoController {
     return videoToDownload;
   }
 
-  downloadVideo(video, convertToMusic, nbRetry) {
+  downloadVideo(video, convertToMusic) {
     return new Promise(async (resolve, reject) => {
-      var code = await this.spawnDownloadScript(video, convertToMusic);
+      try {
+        var code = await this.spawnDownloadScript(video, convertToMusic);
 
-      if (code === 403 && nbRetry < this.maxRetry) {
-        console.log(`Error 403 while downloading. Retry number ${nbRetry + 1} download video with ID=${video.videoId}`);
-
-        try {
-          code = await this.downloadVideo(video, convertToMusic, nbRetry + 1);
+        if (code === 0) {
           resolve(code);
           return;
-        } catch (errorCode) {
-          reject(errorCode);
-          return;
-        }
-      }
+        } else if (code === 403) {
+          for (let nbRetry = 0; nbRetry < this.maxRetry; nbRetry++) {
+            console.log(`Error 403 while downloading. Retry number ${nbRetry} download video with ID=${video.videoId}`);
 
-      if (code === 0) {
-        resolve(code);
-        return;
-      } else {
-        console.error(`Erreur pendant le téléchargement. Code youtube-dl : ${code}.`);
+            code = await this.spawnDownloadScript(video, convertToMusic, nbRetry + 1);
+            if (code === 0) {
+              resolve(code);
+              return;
+            } else if (code !== 0 && code !== 403) {
+              throw code;
+            }
+          }
+
+          // les retry ont échoués
+          throw code;
+        } else {
+          // Erreur autre
+          throw code;
+        }
+      } catch (errorCode) {
+        console.error(`Erreur pendant le téléchargement. Code youtube-dl : ${errorCode}.`);
         videoDataService.addVideoWithError({
           ...video,
           date: new Date().toLocaleString(),
           error: true,
         });
 
-        this.socket.emit("error", code);
-        reject(code);
+        this.socket.emit("error", errorCode);
+        reject(errorCode);
         return;
       }
     });
@@ -126,6 +133,14 @@ class VideoController {
         reject(error);
       }
     });
+  }
+
+  getSocket() {
+    return this.socket;
+  }
+
+  setSocket(socket) {
+    this.socket = socket;
   }
 
   initDownloadSocket() {
