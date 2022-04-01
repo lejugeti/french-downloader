@@ -13,6 +13,7 @@ class VideoController {
   percentagePattern = /\d{2,3}\.?\d{0,2}%/;
   httpCodePattern = /(?<= )\d{3}(?!\.)/;
   timePattern = /(?<=ETA )\d{2}:\d{2}/;
+  socket;
 
   getVideosDownloaded() {
     return videoDataService.getVideos();
@@ -31,7 +32,8 @@ class VideoController {
     };
 
     videoDataService.addVideo(videoToDownload);
-    this.downloadVideo(video, convertToMusic, 0);
+    this.initDownloadSocket();
+    this.downloadVideo(video, convertToMusic, 0).finally(() => this.socket.close());
 
     return videoToDownload;
   }
@@ -64,6 +66,7 @@ class VideoController {
           error: true,
         });
 
+        this.socket.emit("error", code);
         reject(code);
         return;
       }
@@ -92,8 +95,6 @@ class VideoController {
       }
 
       var child = spawn(command, args);
-      var socket = SocketService.createSocket(9000);
-      socket.on("connection_error", (err) => console.log(error));
 
       // Logs du process
       child.stdout.setEncoding("utf8");
@@ -101,7 +102,7 @@ class VideoController {
       child.stdout.on("data", (data) => {
         console.log(data);
         if (this.isDownloadInfos(data)) {
-          socket.emit("downloadInfos", this.parseDownloadPercentage(data), this.parseDownloadTime(data));
+          this.socket.emit("downloadInfos", this.parseDownloadPercentage(data), this.parseDownloadTime(data));
         }
       });
 
@@ -111,7 +112,6 @@ class VideoController {
       });
 
       child.on("close", (code) => {
-        socket.close();
         resolve(httpErrorCode || code);
       });
     });
@@ -126,6 +126,12 @@ class VideoController {
         reject(error);
       }
     });
+  }
+
+  initDownloadSocket() {
+    var socketDownload = SocketService.createSocket(9000);
+    socketDownload.on("connection_error", (err) => console.log(error));
+    this.socket = socketDownload;
   }
 
   isDownloadInfos(logLine) {

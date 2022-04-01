@@ -95,6 +95,10 @@ const VideoResult = ({ video, alreadyDownloaded, previousDownloadError }) => {
       setPercentageDownloadSafe(percentageDownloadData);
       setTimeDownloadSafe(timeDownloadData);
     });
+    socket.on("error", (errorCode) => {
+      console.log({ errorCode });
+      setDownloadErrorSafe(true);
+    });
 
     setSocketDownloadSafe(socket);
   };
