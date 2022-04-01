@@ -10,7 +10,7 @@ import DownloadStatus from "../../download-status/download-status.component";
 
 import "./video-result.css";
 
-const VideoResult = ({ video, alreadyDownloaded }) => {
+const VideoResult = ({ video, alreadyDownloaded, previousDownloadError }) => {
   const { id, snippet } = video;
   const { thumbnails } = snippet;
 
@@ -25,6 +25,10 @@ const VideoResult = ({ video, alreadyDownloaded }) => {
   useEffect(() => {
     if (videoContext.currentVideoDownloading.videoId === video.videoId) {
       openDownloadSocket();
+    }
+
+    if (previousDownloadError) {
+      setDownloadError(previousDownloadError);
     }
 
     return function cleanup() {
@@ -100,7 +104,6 @@ const VideoResult = ({ video, alreadyDownloaded }) => {
   };
 
   const showDownloadStatus = () => {
-    // console.log({ downloading: videoIsDownloading(), alreadyDownloaded });
     return !videoIsDownloading() && alreadyDownloaded;
   };
 
@@ -113,6 +116,7 @@ const VideoResult = ({ video, alreadyDownloaded }) => {
           width: thumbnails.medium.width,
         }}
         src={thumbnails.medium.url}
+        onClick={() => console.log(previousDownloadError)}
       />
       <div className='video-informations'>
         <span className='video-title'>{snippet.title}</span>

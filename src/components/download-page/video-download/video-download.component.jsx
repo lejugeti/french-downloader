@@ -22,7 +22,7 @@ const VideoDownload = (props) => {
   var [socketDownload, setSocketDownload] = useState();
   var [percentageDownload, setPercentageDownload] = useState();
   var [timeDownload, setTimeDownload] = useState();
-  var [downloadError, setDownloadError] = useState(false);
+  var [downloadError, setDownloadError] = useState(video.error);
 
   useEffect(() => {
     if (videoContext.currentVideoDownloading.id === video.id) {
