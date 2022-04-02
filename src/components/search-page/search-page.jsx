@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { TextField } from "@mui/material";
 import InputAdornment from "@mui/material/InputAdornment";
 import SearchIcon from "@mui/icons-material/Search";
@@ -6,19 +6,27 @@ import VideoResult from "./video-result/video-result.component";
 
 import "./search-page.css";
 import YoutubeService from "../../services/youtube.service";
+import videosService from "../../services/videos.service";
+import arrayService from "../../services/array.service";
 
 const SearchPage = function (props) {
   const [query, setQuery] = useState("");
   const [searchResult, setSearchResult] = useState([]);
+  const [videoAlreadyDownloaded, setVideoAlreadyDownloaded] = useState([]);
 
-  const searchVideos = (query) => {
+  const searchVideos = async (query) => {
     if (query !== "") {
-      YoutubeService.searchVideos(query)
-        .then((res) => {
-          console.log(res);
-          setSearchResult(res.data.items);
-        })
-        .catch((err) => console.error(err));
+      try {
+        const videosQueried = await YoutubeService.searchVideos(query);
+        const videoDownloaded = await videosService.getVideosDownloadedFilteredById(
+          videosQueried.map((video) => video.id.videoId)
+        );
+        setVideoAlreadyDownloaded(videoDownloaded);
+        setSearchResult(videosQueried);
+      } catch (error) {
+        console.error(err);
+        // TODO : mettre popup error
+      }
     }
   };
 
@@ -26,6 +34,18 @@ const SearchPage = function (props) {
     if (keyEvent.key === "Enter") {
       searchVideos(query);
     }
+  };
+
+  const videoIsDownloaded = (videoId) => {
+    return videoAlreadyDownloaded.map((video) => video.videoId).includes(videoId);
+  };
+
+  const previousDownloadHasFailed = (videoId) => {
+    const videoPreviouslyDownloaded = arrayService
+      .sortVideosByIdDesc(videoAlreadyDownloaded)
+      .find((video) => video.videoId === videoId);
+
+    return videoPreviouslyDownloaded ? videoPreviouslyDownloaded.error : null;
   };
 
   return (
@@ -47,7 +67,12 @@ const SearchPage = function (props) {
       />
       <div className='search-results'>
         {searchResult.map((video) => (
-          <VideoResult key={video.id.videoId} video={video} />
+          <VideoResult
+            key={video.id.videoId}
+            video={video}
+            alreadyDownloaded={videoIsDownloaded(video.id.videoId)}
+            previousDownloadError={previousDownloadHasFailed(video.id.videoId)}
+          />
         ))}
       </div>
     </div>

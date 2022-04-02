@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { TextField } from "@mui/material";
 import InputAdornment from "@mui/material/InputAdornment";
 import SearchIcon from "@mui/icons-material/Search";
@@ -56,14 +56,16 @@ const DownloadPage = function (props) {
         onKeyDown={handleEnterKeySearch}
       />
       <div className='download-results'>
-        {videosDownloaded.map((video, index) => (
-          <VideoDownload
-            key={index}
-            video={video}
-            onDownloadVideo={refreshVideosDownloaded}
-            onDeleteVideo={refreshVideosDownloaded}
-          />
-        ))}
+        {videosDownloaded
+          .map((video, index) => (
+            <VideoDownload
+              key={index}
+              video={video}
+              onDownloadVideo={refreshVideosDownloaded}
+              onDeleteVideo={refreshVideosDownloaded}
+            />
+          ))
+          .sort((v1, v2) => v2.props.video.id - v1.props.video.id)}
       </div>
     </div>
   );

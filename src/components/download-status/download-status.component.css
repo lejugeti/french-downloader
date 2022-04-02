@@ -1,0 +1,15 @@
+.download-status-OK,
+.download-status-ERROR {
+  display: flex;
+  align-items: flex-end;
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
+.download-status-OK {
+  color: green;
+}
+
+.download-status-ERROR {
+  color: rgb(185, 8, 8);
+}

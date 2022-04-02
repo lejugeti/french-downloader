@@ -9,6 +9,10 @@ class VideoDataService {
     this.readData();
   }
 
+  getNewId() {
+    return this.videos.length != 0 ? Math.max(...this.getVideos().map((video) => video.id)) + 1 : 0;
+  }
+
   getVideos() {
     return this.videos;
   }
@@ -17,14 +21,18 @@ class VideoDataService {
     return JSON.stringify(this.videos);
   }
 
+  getVideosFiltered(videoIdList) {
+    return this.videos.filter((video) => videoIdList.includes(video.videoId));
+  }
+
   addVideo(video) {
-    this.videos = this.filterVideosWithError(video.id);
+    this.videos = this.filterVideosWithError(video.videoId);
     this.videos.push(video);
     this.saveData();
   }
 
   addVideoWithError(video) {
-    this.videos = this.filterVideosWithError(video.id);
+    this.videos = this.filterVideosWithError(video.videoId);
     this.videos.push(video);
     this.saveData();
   }
@@ -45,7 +53,7 @@ class VideoDataService {
   }
 
   filterVideosWithError(videoId) {
-    return this.videos.filter((vid) => vid.id !== videoId || (vid.id === videoId && vid.error == false));
+    return this.videos.filter((vid) => vid.videoId !== videoId || (vid.videoId === videoId && vid.error == false));
   }
 
   //#region manipulate data file

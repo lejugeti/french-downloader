@@ -1,44 +1,28 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { Button } from "@mui/material";
 import DownloadIcon from "@mui/icons-material/Download";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import ErrorIcon from "@mui/icons-material/Error";
 import CancelIcon from "@mui/icons-material/Cancel";
+import DownloadContext from "../../../contexts/download.context";
 import VideosService from "../../../services/videos.service";
-import VideoDownloadingContext from "../../../contexts/video-downloading.context";
-import socketService from "../../../services/socket.service";
+
+import DownloadProgress from "../../download-progress/download-progress.component";
+import DownloadStatus from "../../download-status/download-status.component";
 
 import "./video-download.css";
 
 const VideoDownload = (props) => {
   const { video } = props;
   const { thumbnail } = video;
-  var socket;
 
-  var videoContext = useContext(VideoDownloadingContext);
-  var [percentageDownload, setPercentageDownload] = useState();
-  var [timeDownload, setTimeDownload] = useState();
+  var _isMounted = true;
+  var downloadContext = useContext(DownloadContext);
 
   const handleDownloadVideo = (convertToMusic) => {
-    socket = socketService.createServer();
-    socket.on("connection_error", (err) => console.log(error));
-    socket.on("disconnect", () => {
-      socket.close();
-      socket = null;
-    });
-    socket.on("downloadInfos", (percentageDownloadData, timeDownloadData) => {
-      console.log({ percentageDownloadData, timeDownloadData });
-      setPercentageDownload(percentageDownloadData);
-      setTimeDownload(timeDownloadData);
-    });
-
     VideosService.downloadVideo(props.video, convertToMusic)
-      .then(() => {
-        props.onDownloadVideo();
-      })
       .catch((error) => {
         console.log(error);
-      });
+      })
+      .finally(() => props.onDownloadVideo());
   };
 
   const handleDeleteVideoDownloaded = async () => {
@@ -51,22 +35,8 @@ const VideoDownload = (props) => {
     }
   };
 
-  const renderDownloadStatus = () => {
-    if (video.error) {
-      return (
-        <span className='download-status-ERROR'>
-          Download Error
-          <ErrorIcon />
-        </span>
-      );
-    } else {
-      return (
-        <span className='download-status-OK'>
-          Download Success
-          <CheckCircleIcon />
-        </span>
-      );
-    }
+  const videoIsDownloading = () => {
+    return downloadContext.videoId === video.id;
   };
 
   return (
@@ -83,8 +53,14 @@ const VideoDownload = (props) => {
         <span className='video-title'>{video.title}</span>
         <span className='video-channel'>{video.channelTitle}</span>
         <div className='download-informations'>
-          {renderDownloadStatus()}
-          <span className='download-date'>{video.date}</span>
+          {videoIsDownloading() ? (
+            <DownloadProgress
+              percentageDownload={downloadContext.percentageDownload}
+              timeDownload={downloadContext.timeDownload}
+            />
+          ) : (
+            <DownloadStatus downloadDate={video.date} downloadError={video.error} />
+          )}
         </div>
 
         <div className='video-buttons'>

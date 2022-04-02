@@ -29,6 +29,10 @@
   margin-top: 0.5em;
 }
 
+.download-informations {
+  margin-top: 1em;
+}
+
 .video-buttons {
   display: flex;
 }

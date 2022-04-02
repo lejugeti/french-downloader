@@ -1,8 +1,8 @@
 const React = require("react");
 
 var VideoDownloadingContext = React.createContext({
-  currentVideoId: "videoId",
-  updateVideoDownloading: (videoId) => {},
+  currentVideoDownloading: { id: "id", videoId: "videoId" },
+  updateVideoDownloading: (id, videoId) => {},
   resetVideoDownloading: () => {},
 });
 
