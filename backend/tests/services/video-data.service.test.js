@@ -1,6 +1,10 @@
 const videoDataService = require("../../services/video-data.service");
 
 describe("Video data service", () => {
+  beforeAll(() => {
+    var spySaveData = jest.spyOn(videoDataService, "saveData").mockImplementation(jest.fn());
+  });
+
   test("Remove video", async () => {
     videoDataService.videos = [
       { videoId: "videoId", date: "2022-3-26 18:05:46", error: false },
