@@ -1,12 +1,9 @@
 import React, { useState, useContext, useEffect } from "react";
 import { Button } from "@mui/material";
 import DownloadIcon from "@mui/icons-material/Download";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import ErrorIcon from "@mui/icons-material/Error";
 import CancelIcon from "@mui/icons-material/Cancel";
+import DownloadContext from "../../../contexts/download.context";
 import VideosService from "../../../services/videos.service";
-import VideoDownloadingContext from "../../../contexts/video-downloading.context";
-import socketService from "../../../services/socket.service";
 
 import DownloadProgress from "../../download-progress/download-progress.component";
 import DownloadStatus from "../../download-status/download-status.component";
@@ -18,86 +15,14 @@ const VideoDownload = (props) => {
   const { thumbnail } = video;
 
   var _isMounted = true;
-  var videoContext = useContext(VideoDownloadingContext);
-  var [socketDownload, setSocketDownload] = useState();
-  var [percentageDownload, setPercentageDownload] = useState();
-  var [timeDownload, setTimeDownload] = useState();
-  var [downloadError, setDownloadError] = useState(video.error);
-
-  useEffect(() => {
-    if (videoContext.currentVideoDownloading.id === video.id) {
-      openDownloadSocket();
-    }
-
-    return function cleanup() {
-      _isMounted = false;
-    };
-  }, []);
-
-  //#region Setters safe
-  const setSocketDownloadSafe = (socket) => {
-    if (_isMounted) {
-      setSocketDownload(socket);
-    }
-  };
-
-  const setPercentageDownloadSafe = (percentage) => {
-    if (_isMounted) {
-      setPercentageDownload(percentage);
-    }
-  };
-
-  const setTimeDownloadSafe = (time) => {
-    if (_isMounted) {
-      setTimeDownload(time);
-    }
-  };
-
-  const setDownloadDateSafe = (date) => {
-    if (_isMounted) {
-      setDownloadDate(date);
-    }
-  };
-
-  const setDownloadErrorSafe = (error) => {
-    if (_isMounted) {
-      setDownloadError(error);
-    }
-  };
-  //#endregion
-
-  const openDownloadSocket = () => {
-    var socket = socketService.createServer();
-
-    socket.on("connection_error", (err) => console.log(error));
-    socket.on("disconnect", () => {
-      socket.close();
-      setSocketDownloadSafe(null);
-      videoContext.resetVideoDownloading();
-    });
-    socket.on("downloadInfos", (percentageDownloadData, timeDownloadData) => {
-      console.log({ percentageDownloadData, timeDownloadData });
-      setPercentageDownloadSafe(percentageDownloadData);
-      setTimeDownloadSafe(timeDownloadData);
-    });
-    socket.on("error", (errorCode) => {
-      console.log({ errorCode });
-      setDownloadErrorSafe(true);
-    });
-
-    setSocketDownloadSafe(socket);
-  };
+  var downloadContext = useContext(DownloadContext);
 
   const handleDownloadVideo = (convertToMusic) => {
     VideosService.downloadVideo(props.video, convertToMusic)
-      .then((videoDownloading) => {
-        videoContext.updateVideoDownloading(videoDownloading.id, videoDownloading.videoId);
-        props.onDownloadVideo();
-        setDownloadErrorSafe(videoDownloading.error);
-      })
       .catch((error) => {
         console.log(error);
-      });
+      })
+      .finally(() => props.onDownloadVideo());
   };
 
   const handleDeleteVideoDownloaded = async () => {
@@ -111,7 +36,7 @@ const VideoDownload = (props) => {
   };
 
   const videoIsDownloading = () => {
-    return socketDownload !== null && socketDownload !== undefined;
+    return downloadContext.videoId === video.id;
   };
 
   return (
@@ -129,9 +54,12 @@ const VideoDownload = (props) => {
         <span className='video-channel'>{video.channelTitle}</span>
         <div className='download-informations'>
           {videoIsDownloading() ? (
-            <DownloadProgress percentageDownload={percentageDownload} timeDownload={timeDownload} />
+            <DownloadProgress
+              percentageDownload={downloadContext.percentageDownload}
+              timeDownload={downloadContext.timeDownload}
+            />
           ) : (
-            <DownloadStatus downloadDate={video.date} downloadError={downloadError} />
+            <DownloadStatus downloadDate={video.date} downloadError={video.error} />
           )}
         </div>
 

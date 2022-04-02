@@ -2,8 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { Button } from "@mui/material";
 import DownloadIcon from "@mui/icons-material/Download";
 import YoutubeDownloadService from "../../../services/videos.service";
-import VideoDownloadingContext from "../../../contexts/video-downloading.context";
-import socketService from "../../../services/socket.service";
+import DownloadContext from "../../../contexts/download.context";
 
 import DownloadProgress from "../../download-progress/download-progress.component";
 import DownloadStatus from "../../download-status/download-status.component";
@@ -15,47 +14,21 @@ const VideoResult = ({ video, alreadyDownloaded, previousDownloadError }) => {
   const { thumbnails } = snippet;
 
   var _isMounted = true;
-  var videoContext = useContext(VideoDownloadingContext);
-  var [socketDownload, setSocketDownload] = useState();
-  var [percentageDownload, setPercentageDownload] = useState();
-  var [timeDownload, setTimeDownload] = useState();
+  var downloadContext = useContext(DownloadContext);
   var [downloadError, setDownloadError] = useState(false);
   var [downloadDate, setDownloadDate] = useState("");
 
   useEffect(() => {
-    if (videoContext.currentVideoDownloading.videoId === video.videoId) {
-      openDownloadSocket();
-    }
-
     if (previousDownloadError) {
       setDownloadError(previousDownloadError);
     }
 
     return function cleanup() {
       _isMounted = false;
-      setSocketDownload(null);
     };
   }, []);
 
   //#region Setters safe
-  const setSocketDownloadSafe = (socket) => {
-    if (_isMounted) {
-      setSocketDownload(socket);
-    }
-  };
-
-  const setPercentageDownloadSafe = (percentage) => {
-    if (_isMounted) {
-      setPercentageDownload(percentage);
-    }
-  };
-
-  const setTimeDownloadSafe = (time) => {
-    if (_isMounted) {
-      setTimeDownload(time);
-    }
-  };
-
   const setDownloadDateSafe = (date) => {
     if (_isMounted) {
       setDownloadDate(date);
@@ -72,39 +45,14 @@ const VideoResult = ({ video, alreadyDownloaded, previousDownloadError }) => {
   const handleDownloadVideo = (convertToMusic) => {
     YoutubeDownloadService.downloadVideo(video, convertToMusic)
       .then((videoDownloading) => {
-        videoContext.updateVideoDownloading(videoDownloading.id, videoDownloading.videoId);
-        openDownloadSocket();
-
         setDownloadErrorSafe(videoDownloading.error);
         setDownloadDateSafe(videoDownloading.date);
       })
       .catch((error) => console.log(error));
   };
 
-  const openDownloadSocket = () => {
-    var socket = socketService.createServer();
-
-    socket.on("connection_error", (err) => console.log(error));
-    socket.on("disconnect", () => {
-      socket.close();
-      setSocketDownload(null);
-      videoContext.resetVideoDownloading();
-    });
-    socket.on("downloadInfos", (percentageDownloadData, timeDownloadData) => {
-      console.log({ percentageDownloadData, timeDownloadData });
-      setPercentageDownloadSafe(percentageDownloadData);
-      setTimeDownloadSafe(timeDownloadData);
-    });
-    socket.on("error", (errorCode) => {
-      console.log({ errorCode });
-      setDownloadErrorSafe(true);
-    });
-
-    setSocketDownloadSafe(socket);
-  };
-
   const videoIsDownloading = () => {
-    return socketDownload !== null && socketDownload !== undefined;
+    return downloadContext.videoYoutubeId === video.id.videoId;
   };
 
   const showDownloadStatus = () => {
@@ -127,7 +75,10 @@ const VideoResult = ({ video, alreadyDownloaded, previousDownloadError }) => {
 
         <div className='download-informations'>
           {videoIsDownloading() && (
-            <DownloadProgress percentageDownload={percentageDownload} timeDownload={timeDownload} />
+            <DownloadProgress
+              percentageDownload={downloadContext.percentageDownload}
+              timeDownload={downloadContext.timeDownload}
+            />
           )}
           {showDownloadStatus() && <DownloadStatus downloadDate={downloadDate} downloadError={downloadError} />}
         </div>

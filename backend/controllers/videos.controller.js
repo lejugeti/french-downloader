@@ -1,6 +1,6 @@
 const { spawn } = require("child_process");
 var videoDataService = require("../services/video-data.service");
-var SocketService = require("../services/socket.service");
+const socketService = require("../services/socket.service");
 
 const youtubeUrl = "https://www.youtube.com/watch?v=";
 const libraryPaths = {
@@ -13,7 +13,6 @@ class VideoController {
   percentagePattern = /\d{2,3}\.?\d{0,2}%/;
   httpCodePattern = /(?<= )\d{3}(?!\.)/;
   timePattern = /(?<=ETA )\d{2}:\d{2}/;
-  socket;
 
   getVideosDownloaded() {
     return videoDataService.getVideos();
@@ -32,8 +31,12 @@ class VideoController {
     };
 
     videoDataService.addVideo(videoToDownload);
-    this.initDownloadSocket();
-    this.downloadVideo(video, convertToMusic, 0).finally(() => this.socket.close());
+    this.downloadVideo(videoToDownload, convertToMusic, 0)
+      .then((code) => {})
+      .catch((errorCode) => {
+        socketService.getSocket().emit("download-error", errorCode);
+      })
+      .finally(() => socketService.getSocket().emit("download-ended"));
 
     return videoToDownload;
   }
@@ -41,6 +44,7 @@ class VideoController {
   downloadVideo(video, convertToMusic) {
     return new Promise(async (resolve, reject) => {
       try {
+        socketService.getSocket().emit("download-begin", video.id, video.videoId);
         var code = await this.spawnDownloadScript(video, convertToMusic);
 
         if (code === 0) {
@@ -73,7 +77,6 @@ class VideoController {
           error: true,
         });
 
-        this.socket.emit("error", errorCode);
         reject(errorCode);
         return;
       }
@@ -82,7 +85,7 @@ class VideoController {
 
   spawnDownloadScript(video, convertToMusic) {
     return new Promise((resolve, reject) => {
-      const videoId = video.videoId;
+      const { videoId } = video;
       var httpErrorCode = null;
 
       console.log(`Download video with id=${videoId} as a ${convertToMusic === true ? "MUSIC" : "VIDEO"} FILE`);
@@ -109,7 +112,9 @@ class VideoController {
       child.stdout.on("data", (data) => {
         console.log(data);
         if (this.isDownloadInfos(data)) {
-          this.socket.emit("downloadInfos", this.parseDownloadPercentage(data), this.parseDownloadTime(data));
+          socketService
+            .getSocket()
+            .emit("download-informations", this.parseDownloadPercentage(data), this.parseDownloadTime(data));
         }
       });
 
@@ -133,20 +138,6 @@ class VideoController {
         reject(error);
       }
     });
-  }
-
-  getSocket() {
-    return this.socket;
-  }
-
-  setSocket(socket) {
-    this.socket = socket;
-  }
-
-  initDownloadSocket() {
-    var socketDownload = SocketService.createSocket(9000);
-    socketDownload.on("connection_error", (err) => console.log(error));
-    this.socket = socketDownload;
   }
 
   isDownloadInfos(logLine) {
