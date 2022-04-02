@@ -120,7 +120,6 @@ const VideoResult = ({ video, alreadyDownloaded, previousDownloadError }) => {
           width: thumbnails.medium.width,
         }}
         src={thumbnails.medium.url}
-        onClick={() => console.log(previousDownloadError)}
       />
       <div className='video-informations'>
         <span className='video-title'>{snippet.title}</span>

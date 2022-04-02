@@ -44,9 +44,6 @@ const SearchPage = function (props) {
     const videoPreviouslyDownloaded = arrayService
       .sortVideosByIdDesc(videoAlreadyDownloaded)
       .find((video) => video.videoId === videoId);
-    if (videoId === "rUWxSEwctFU") {
-      console.log({ videoId, error: videoPreviouslyDownloaded.error });
-    }
 
     return videoPreviouslyDownloaded ? videoPreviouslyDownloaded.error : null;
   };
