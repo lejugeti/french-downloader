@@ -17,6 +17,7 @@ const VideoResult = ({ video, alreadyDownloaded, previousDownloadError }) => {
   var downloadContext = useContext(DownloadContext);
   var [downloadError, setDownloadError] = useState(false);
   var [downloadDate, setDownloadDate] = useState("");
+  var [videoAlreadyDownloaded, setVideoAlreadyDownloaded] = useState(alreadyDownloaded);
 
   useEffect(() => {
     if (previousDownloadError) {
@@ -40,9 +41,19 @@ const VideoResult = ({ video, alreadyDownloaded, previousDownloadError }) => {
       setDownloadError(error);
     }
   };
+
+  const setVideoAlreadyDownloadedSafe = (isDownloaded) => {
+    if (_isMounted) {
+      setVideoAlreadyDownloaded(isDownloaded);
+    }
+  };
   //#endregion
 
   const handleDownloadVideo = (convertToMusic) => {
+    downloadContext.socket.once("download-ended", () => {
+      setVideoAlreadyDownloadedSafe(true);
+    });
+
     YoutubeDownloadService.downloadVideo(video, convertToMusic)
       .then((videoDownloading) => {
         setDownloadErrorSafe(videoDownloading.error);
@@ -56,7 +67,7 @@ const VideoResult = ({ video, alreadyDownloaded, previousDownloadError }) => {
   };
 
   const showDownloadStatus = () => {
-    return !videoIsDownloading() && alreadyDownloaded;
+    return !videoIsDownloading() && videoAlreadyDownloaded;
   };
 
   return (
