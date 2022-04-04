@@ -1,5 +1,6 @@
 const downloadVideoService = require("./download-video.service");
 const socketService = require("./socket.service");
+const videoDataService = require("./video-data.service");
 
 class DownloadQueueService {
   queue = [];
@@ -33,7 +34,6 @@ class DownloadQueueService {
   }
 
   async downloadVideosInQueue() {
-    console.log({ queue: this.queue });
     this.setIsDownloadStarted(true);
 
     while (this.queue.length > 0) {
@@ -42,11 +42,12 @@ class DownloadQueueService {
       try {
         socketService.getSocket().emit("download-begin", currentVideo.id, currentVideo.videoId);
         await downloadVideoService.downloadVideo(currentVideo);
+        videoDataService.updateDownloadStatus(currentVideo.id, true);
+        socketService.getSocket().emit("download-ended", currentVideo.id, true);
       } catch (codeError) {
         console.error(codeError);
         socketService.getSocket().emit("download-error", codeError);
-      } finally {
-        socketService.getSocket().emit("download-ended");
+        socketService.getSocket().emit("download-ended", currentVideo.id, false);
       }
     }
     this.setIsDownloadStarted(false);

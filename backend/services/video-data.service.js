@@ -37,6 +37,16 @@ class VideoDataService {
     this.saveData();
   }
 
+  updateDownloadStatus(id, isDownloaded) {
+    this.videos.find((video) => video.id === id).isDownloaded = isDownloaded;
+    this.saveData();
+  }
+
+  updateErrorStatus(id, errorOccurred) {
+    this.videos.find((video) => video.id === id).error = errorOccurred;
+    this.saveData();
+  }
+
   removeVideo(videoId, date) {
     const videoIndex = this.videos.findIndex((video) => video.videoId === videoId && video.date === date);
 

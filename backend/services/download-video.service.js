@@ -46,6 +46,7 @@ class DownloadVideoService {
         videoDataService.addVideoWithError({
           ...video,
           date: new Date().toLocaleString(),
+          isDownloaded: false,
           error: true,
         });
 

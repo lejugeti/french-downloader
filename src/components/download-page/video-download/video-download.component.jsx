@@ -10,26 +10,37 @@ import DownloadStatus from "../../download-status/download-status.component";
 
 import "./video-download.css";
 
-const VideoDownload = (props) => {
-  const { video } = props;
+const VideoDownload = ({ video, onDownloadVideo, onVideoDownloaded, onDeleteVideo }) => {
   const { thumbnail } = video;
 
   var _isMounted = true;
   var downloadContext = useContext(DownloadContext);
+  var [videoIsDownloaded, setVideoIsDownloaded] = useState(video.isDownloaded);
+
+  useEffect(() => {
+    if (downloadContext.videoId === video.id) {
+      downloadContext.socket.once("download-ended", (videoId, isDownloaded) => {
+        console.log({ videoId, isDownloaded });
+        onVideoDownloaded(videoId, isDownloaded);
+      });
+    }
+  }, []);
 
   const handleDownloadVideo = (convertToMusic) => {
-    VideosService.downloadVideo(props.video, convertToMusic)
+    VideosService.downloadVideo(video, convertToMusic)
       .catch((error) => {
         console.log(error);
       })
-      .finally(() => props.onDownloadVideo());
+      .finally(async () => {
+        await onDownloadVideo();
+      });
   };
 
   const handleDeleteVideoDownloaded = async () => {
     const status = await VideosService.deleteVideo(video);
 
     if (status == 200) {
-      props.onDeleteVideo();
+      onDeleteVideo();
     } else {
       alert(`Error while deleting video : ${video.title}`);
     }
@@ -53,14 +64,13 @@ const VideoDownload = (props) => {
         <span className='video-title'>{video.title}</span>
         <span className='video-channel'>{video.channelTitle}</span>
         <div className='download-informations'>
-          {videoIsDownloading() ? (
+          {videoIsDownloading() && (
             <DownloadProgress
               percentageDownload={downloadContext.percentageDownload}
               timeDownload={downloadContext.timeDownload}
             />
-          ) : (
-            <DownloadStatus downloadDate={video.date} downloadError={video.error} />
           )}
+          {video.isDownloaded && <DownloadStatus downloadDate={video.date} downloadError={video.error} />}
         </div>
 
         <div className='video-buttons'>

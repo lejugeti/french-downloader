@@ -43,4 +43,24 @@ describe("Video data service", () => {
 
     expect(videoDataService.getNewId()).toBe(3);
   });
+
+  test("updateDownloadStatus", () => {
+    videoDataService.videos = [
+      { id: 0, videoId: "videoId", error: false, downloaded: false },
+      { id: 1, videoId: "videoId", error: false, downloaded: false },
+    ];
+
+    videoDataService.updateDownloadStatus(0, true);
+    expect(videoDataService.videos[0].isDownloaded).toBeTruthy();
+  });
+
+  test("updateErrorStatus", () => {
+    videoDataService.videos = [
+      { id: 0, videoId: "videoId", error: false, error: false },
+      { id: 1, videoId: "videoId", error: false, error: false },
+    ];
+
+    videoDataService.updateErrorStatus(1, true);
+    expect(videoDataService.videos[1].error).toBeTruthy();
+  });
 });

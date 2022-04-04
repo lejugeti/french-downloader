@@ -4,6 +4,7 @@ import InputAdornment from "@mui/material/InputAdornment";
 import SearchIcon from "@mui/icons-material/Search";
 import VideoDownload from "./video-download/video-download.component";
 import videosService from "../../services/videos.service";
+import DownloadContext from "../../contexts/download.context";
 
 import "./download-page.css";
 
@@ -11,14 +12,16 @@ const DownloadPage = function (props) {
   const [videosDownloaded, setVideosDownloaded] = useState([]);
   const [searchResult, setSearchResult] = useState([]);
 
+  var downloadContext = useContext(DownloadContext);
+
   useEffect(() => {
     refreshVideosDownloaded();
   }, []);
 
-  const refreshVideosDownloaded = () => {
-    videosService.getVideosDownloaded().then((videos) => {
-      setVideosDownloaded(videos);
-    });
+  const refreshVideosDownloaded = async () => {
+    const videos = await videosService.getVideosDownloaded();
+    console.log({ refresh: videos });
+    setVideosDownloaded(videos);
   };
 
   const searchVideos = (query) => {
@@ -36,6 +39,13 @@ const DownloadPage = function (props) {
     if (keyEvent.key === "Enter") {
       searchVideos(query);
     }
+  };
+
+  const onVideoDownloaded = async (videoId, isDownloaded) => {
+    let newVideoDownloaded = [].concat(videosDownloaded);
+    newVideoDownloaded.find((video) => video.id === videoId).isDownloaded = isDownloaded;
+    console.log({ newVideoDownloaded });
+    setVideosDownloaded(newVideoDownloaded);
   };
 
   return (
@@ -62,6 +72,7 @@ const DownloadPage = function (props) {
               key={index}
               video={video}
               onDownloadVideo={refreshVideosDownloaded}
+              onVideoDownloaded={(videoId, isDownloaded) => onVideoDownloaded(videoId, isDownloaded)}
               onDeleteVideo={refreshVideosDownloaded}
             />
           ))

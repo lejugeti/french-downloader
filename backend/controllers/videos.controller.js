@@ -16,8 +16,9 @@ class VideoController {
       id: videoDataService.getNewId(),
       ...video,
       date: new Date().toLocaleString(),
-      error: false,
       convertToMusic,
+      isDownloaded: false,
+      error: false,
     };
 
     videoDataService.addVideo(videoToDownload);
