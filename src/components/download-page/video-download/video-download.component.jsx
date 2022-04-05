@@ -15,13 +15,13 @@ const VideoDownload = ({ video, onDownloadVideo, onVideoDownloaded, onDeleteVide
 
   var _isMounted = true;
   var downloadContext = useContext(DownloadContext);
-  var [videoIsDownloaded, setVideoIsDownloaded] = useState(video.isDownloaded);
 
   useEffect(() => {
-    if (downloadContext.videoId === video.id) {
-      downloadContext.socket.once("download-ended", (videoId, isDownloaded) => {
-        console.log({ videoId, isDownloaded });
-        onVideoDownloaded(videoId, isDownloaded);
+    if (!video.isDownloaded) {
+      downloadContext.socket.on("download-ended", (videoId, isDownloaded) => {
+        if (downloadContext.videoId === video.id) {
+          onVideoDownloaded(videoId, isDownloaded);
+        }
       });
     }
   }, []);

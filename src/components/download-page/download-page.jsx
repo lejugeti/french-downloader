@@ -12,8 +12,6 @@ const DownloadPage = function (props) {
   const [videosDownloaded, setVideosDownloaded] = useState([]);
   const [searchResult, setSearchResult] = useState([]);
 
-  var downloadContext = useContext(DownloadContext);
-
   useEffect(() => {
     refreshVideosDownloaded();
   }, []);
@@ -42,9 +40,8 @@ const DownloadPage = function (props) {
   };
 
   const onVideoDownloaded = async (videoId, isDownloaded) => {
-    let newVideoDownloaded = [].concat(videosDownloaded);
+    let newVideoDownloaded = await videosService.getVideosDownloaded();
     newVideoDownloaded.find((video) => video.id === videoId).isDownloaded = isDownloaded;
-    console.log({ newVideoDownloaded });
     setVideosDownloaded(newVideoDownloaded);
   };
 
