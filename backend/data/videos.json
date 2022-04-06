@@ -7,6 +7,7 @@
     "channelTitle": "Ian Rushton",
     "channelId": "UC6L6vhzL9yknVr9HxuL-TWg",
     "date": "2022-4-2 10:25:16",
+    "isDownloaded": true,
     "error": false
   },
   {
@@ -16,7 +17,9 @@
     "title": "3 Second Video",
     "channelTitle": "Matthew McDonald",
     "channelId": "UC68aZJBtTXowhmMW97Tljkw",
-    "date": "2022-4-2 21:01:59",
+    "isDownloaded": true,
+    "date": "2022-4-7 0:05:40",
+    "convertToMusic": true,
     "error": false
   }
 ]

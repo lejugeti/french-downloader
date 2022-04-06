@@ -10,26 +10,31 @@ import DownloadStatus from "../../download-status/download-status.component";
 
 import "./video-download.css";
 
-const VideoDownload = (props) => {
-  const { video } = props;
+const VideoDownload = ({ video, onDownloadVideo, onVideoDownloaded, onDeleteVideo }) => {
   const { thumbnail } = video;
 
   var _isMounted = true;
   var downloadContext = useContext(DownloadContext);
 
+  // useEffect(() => {
+
+  // }, []);
+
   const handleDownloadVideo = (convertToMusic) => {
-    VideosService.downloadVideo(props.video, convertToMusic)
+    VideosService.downloadVideo(video, convertToMusic)
       .catch((error) => {
         console.log(error);
       })
-      .finally(() => props.onDownloadVideo());
+      .finally(async () => {
+        await onDownloadVideo();
+      });
   };
 
   const handleDeleteVideoDownloaded = async () => {
     const status = await VideosService.deleteVideo(video);
 
     if (status == 200) {
-      props.onDeleteVideo();
+      onDeleteVideo();
     } else {
       alert(`Error while deleting video : ${video.title}`);
     }
@@ -59,8 +64,11 @@ const VideoDownload = (props) => {
               timeDownload={downloadContext.timeDownload}
             />
           ) : (
-            <DownloadStatus downloadDate={video.date} downloadError={video.error} />
+            <DownloadStatus downloadDate={video.date} downloadError={video.error} isDownloaded={video.isDownloaded} />
           )}
+          {/* {video.isDownloaded && (
+            <DownloadStatus downloadDate={video.date} downloadError={video.error} isDownloaded={video.isDownloaded} />
+          )} */}
         </div>
 
         <div className='video-buttons'>

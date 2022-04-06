@@ -17,12 +17,20 @@ class VideoDataService {
     return this.videos;
   }
 
+  getVideosNotDownloaded() {
+    return this.videos.filter((video) => video.isDownloaded === false);
+  }
+
   getVideosAsString() {
     return JSON.stringify(this.videos);
   }
 
   getVideosFiltered(videoIdList) {
     return this.videos.filter((video) => videoIdList.includes(video.videoId));
+  }
+
+  videoIsAlreadySaved(video) {
+    return this.videos.some((vid) => vid.id === video.id && vid.videoId === video.videoId);
   }
 
   addVideo(video) {
@@ -37,6 +45,16 @@ class VideoDataService {
     this.saveData();
   }
 
+  async updateDownloadStatus(id, isDownloaded) {
+    this.videos.find((video) => video.id === id).isDownloaded = isDownloaded;
+    await this.saveData();
+  }
+
+  async updateErrorStatus(id, errorOccurred) {
+    this.videos.find((video) => video.id === id).error = errorOccurred;
+    await this.saveData();
+  }
+
   removeVideo(videoId, date) {
     const videoIndex = this.videos.findIndex((video) => video.videoId === videoId && video.date === date);
 
@@ -48,8 +66,8 @@ class VideoDataService {
     }
   }
 
-  saveData() {
-    this.writeData();
+  async saveData() {
+    await this.writeData();
   }
 
   filterVideosWithError(videoId) {
@@ -57,28 +75,34 @@ class VideoDataService {
   }
 
   //#region manipulate data file
-  createDataFile() {
+  async createDataFile() {
     this.videos = [];
-    this.writeData();
+    await this.writeData();
   }
 
   readData() {
-    fs.readFile(this.dataPath, "utf8", (err, videosData) => {
-      if (err && err.code === "ENOENT") {
-        console.log(`Creating new videos data file at ${path.join(__dirname, this.dataPath)}`);
+    return new Promise((resolve) => {
+      fs.readFile(this.dataPath, "utf8", async (err, videosData) => {
+        if (err && err.code === "ENOENT") {
+          console.log(`Creating new videos data file at ${path.join(__dirname, this.dataPath)}`);
 
-        this.createDataFile();
-      } else {
-        this.videos = JSON.parse(videosData);
-      }
+          await this.createDataFile();
+        } else {
+          this.videos = JSON.parse(videosData);
+        }
+        resolve();
+      });
     });
   }
 
   writeData() {
-    fs.writeFile(this.dataPath, JSON.stringify(this.getVideos()), (err) => {
-      if (err) {
-        console.error(err);
-      }
+    return new Promise((resolve) => {
+      fs.writeFile(this.dataPath, JSON.stringify(this.getVideos()), (err) => {
+        if (err) {
+          console.error(err);
+        }
+        resolve();
+      });
     });
   }
   //#endregion

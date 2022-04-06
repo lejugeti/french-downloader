@@ -3,8 +3,14 @@ import ErrorIcon from "@mui/icons-material/Error";
 
 import "./download-status.component.css";
 
-const DownloadStatus = ({ downloadError, downloadDate }) => {
-  if (downloadError) {
+const DownloadStatus = ({ downloadError, downloadDate, isDownloaded }) => {
+  if (!isDownloaded) {
+    return (
+      <div>
+        <span className='download-status-not-downloaded'>Not downloaded yet</span>
+      </div>
+    );
+  } else if (downloadError && !isDownloaded) {
     return (
       <div>
         <span className='download-status-ERROR'>

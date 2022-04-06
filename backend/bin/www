@@ -13,7 +13,7 @@ const socketService = require("../services/socket.service");
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(process.env.SERVER_PORT || "8080");
+var port = normalizePort(process.env.SERVER_PORT || "9200");
 app.set("port", port);
 
 /**

@@ -1,6 +1,6 @@
 const axios = require("axios").default;
 const qs = require("qs");
-const apiUrl = "http://localhost:8080/videos";
+const apiUrl = "http://localhost:9200/videos";
 
 class VideosService {
   async getVideosDownloaded() {
@@ -77,11 +77,13 @@ class VideosService {
   formatVideo(video) {
     if (this.videoIsNotRaw(video)) {
       return {
+        id: video.id,
         videoId: video.videoId,
         thumbnail: video.thumbnail,
         title: video.title,
         channelTitle: video.channelTitle,
         channelId: video.channelId,
+        isDownloaded: video.isDownloaded,
       };
     } else {
       return {
@@ -96,11 +98,13 @@ class VideosService {
 
   videoIsNotRaw(video) {
     return (
+      video.hasOwnProperty("id") &&
       video.hasOwnProperty("videoId") &&
       video.hasOwnProperty("thumbnail") &&
       video.hasOwnProperty("title") &&
       video.hasOwnProperty("channelTitle") &&
-      video.hasOwnProperty("channelId")
+      video.hasOwnProperty("channelId") &&
+      video.hasOwnProperty("isDownloaded")
     );
   }
 }

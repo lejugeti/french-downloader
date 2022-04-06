@@ -15,12 +15,6 @@ class SocketService {
     });
 
     this.socket.on("connection_error", (err) => console.log(error));
-
-    // return new Server(port, {
-    //   cors: {
-    //     origin: `http://localhost:3000`,
-    //   },
-    // });
   }
 }
 

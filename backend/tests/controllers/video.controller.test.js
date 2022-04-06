@@ -1,100 +1,29 @@
-const videoControllerPath = "../../controllers/videos.controller";
-const socketService = require("../../services/socket.service");
 const videoDataService = require("../../services/video-data.service");
-var videoController = require(videoControllerPath);
-
-jest.mock("../../services/video-data.service");
+const VideoController = require("../../controllers/videos.controller");
+const downloadVideoService = require("../../services/download-video.service");
+const socketService = require("../../services/socket.service");
 
 describe("Video controller", () => {
   beforeAll(() => {
-    videoController.setSocket(socketService.createSocket());
+    var spySaveData = jest.spyOn(videoDataService, "saveData").mockImplementation(jest.fn());
+    var spyDownloadVideo = jest.spyOn(downloadVideoService, "downloadVideo").mockImplementation(jest.fn());
+    var spySocket = jest.spyOn(socketService, "getSocket").mockImplementation(jest.fn());
   });
 
-  test("Download video - code 0", async () => {
-    var spyVideoController = jest
-      .spyOn(videoController, "spawnDownloadScript")
-      .mockImplementation(jest.fn().mockReturnValueOnce(0));
+  test("handleDownloadVideo", async () => {
+    videoDataService.videos = [
+      { id: 0, videoId: "videoId", date: "2022-3-26 18:05:46", error: false, isDownloaded: false },
+      { id: 1, videoId: "videoId", date: "2022-3-26 18:05:45", error: false, isDownloaded: false },
+      { id: 2, videoId: "videoId2", date: "2022-3-26 18:05:45", error: false, isDownloaded: false },
+    ];
 
-    var code = await videoController.downloadVideo({ videoId: "videoId" }, true);
-    expect(code).toBe(0);
-  });
+    const rawVideo = { videoId: "videoIdKek", isDownloaded: false };
+    const notDownloadedVideo = { id: 2, videoId: "videoId2", isDownloaded: false };
 
-  test("Download video - code 500", async () => {
-    var spySpawnDownloadScript = jest
-      .spyOn(videoController, "spawnDownloadScript")
-      .mockImplementation(jest.fn().mockReturnValueOnce(500));
+    const newVideo1 = VideoController.handleDownloadVideo(rawVideo, true);
+    const newVideo2 = VideoController.handleDownloadVideo(notDownloadedVideo, true);
 
-    try {
-      var code = await videoController.downloadVideo({ videoId: "videoId" }, true);
-    } catch (errorCode) {
-      expect(errorCode).toBe(500);
-    }
-  });
-
-  test("Download video - 403 retry", async () => {
-    var spySpawnDownloadScript = jest
-      .spyOn(videoController, "spawnDownloadScript")
-      .mockImplementation(jest.fn().mockReturnValueOnce(403).mockReturnValueOnce(0));
-
-    var code = await videoController.downloadVideo({ videoId: "videoId" }, true);
-    expect(code).toBe(0);
-  });
-
-  test("Download video - 403 retry with error", async () => {
-    var spySpawnDownloadScript = jest
-      .spyOn(videoController, "spawnDownloadScript")
-      .mockImplementation(jest.fn().mockReturnValueOnce(403).mockReturnValueOnce(500));
-
-    try {
-      var code = await videoController.downloadVideo({ videoId: "videoId" }, true);
-    } catch (errorCode) {
-      expect(errorCode).toBe(500);
-    }
-  });
-
-  test("Download video - too much 403 retry", async () => {
-    var spySpawnDownloadScript = jest
-      .spyOn(videoController, "spawnDownloadScript")
-      .mockImplementation(
-        jest
-          .fn()
-          .mockReturnValueOnce(403)
-          .mockReturnValueOnce(403)
-          .mockReturnValueOnce(403)
-          .mockReturnValueOnce(403)
-          .mockReturnValueOnce(403)
-      );
-
-    try {
-      var code = await videoController.downloadVideo({ videoId: "videoId" }, true);
-    } catch (errorCode) {
-      expect(errorCode).toBe(403);
-    }
-  });
-
-  test("Parse percentage", () => {
-    expect(videoController.parseDownloadPercentage("68.5% of total video")).toBe("68.5%");
-    expect(videoController.parseDownloadPercentage("[download]  68.5% of total video")).toBe("68.5%");
-    expect(videoController.parseDownloadPercentage("[download]  62.55% of total video")).toBe("62.55%");
-    expect(videoController.parseDownloadPercentage("[download]  62.% of total video")).toBe("62.%");
-    expect(videoController.parseDownloadPercentage("[download] of total video")).toBe(null);
-  });
-
-  test("Parse http code", () => {
-    expect(videoController.parseHttpErrorCode("HTTP 403")).toBe(403);
-    expect(videoController.parseHttpErrorCode("HTTP 403 video")).toBe(403);
-    expect(videoController.parseHttpErrorCode("[download]  403.110 of total video")).toBe(null);
-  });
-
-  test("Parse download time", () => {
-    expect(videoController.parseDownloadTime("52.24KiB/s ETA 00:03")).toBe("00:03");
-    expect(videoController.parseDownloadTime("52.24KiB/s ETA 00:03 ")).toBe("00:03");
-    expect(videoController.parseDownloadTime("52.24KiB/s ETA 100:03")).toBe(null);
-  });
-
-  test("Is download informations", () => {
-    expect(videoController.isDownloadInfos("52.24KiB/s ETA 00:03")).toBeTruthy();
-    expect(videoController.isDownloadInfos("68.5% blabla ")).toBeTruthy();
-    expect(videoController.isDownloadInfos("52.24KiB/s ETA 100")).toBeFalsy();
+    expect(newVideo1.id).toBe(3);
+    expect(videoDataService.videos.length).toBe(4);
   });
 });
