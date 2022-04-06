@@ -14,7 +14,6 @@ class VideoController {
   handleDownloadVideo(video, convertToMusic) {
     let videoToDownload;
     if (videoDataService.videoIsAlreadySaved(video) && !video.isDownloaded) {
-      console.log("BPOZJFPOIEJF");
       videoToDownload = video;
     } else {
       videoToDownload = {
