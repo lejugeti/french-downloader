@@ -11,9 +11,15 @@ import "./download-page.css";
 const DownloadPage = function (props) {
   const [videosDownloaded, setVideosDownloaded] = useState([]);
   const [searchResult, setSearchResult] = useState([]);
+  var downloadContext = useContext(DownloadContext);
 
   useEffect(() => {
     refreshVideosDownloaded();
+
+    downloadContext.socket.on("download-ended", (videoId, isDownloaded) => {
+      refreshVideosDownloaded();
+      // onVideoDownloaded(videoId, isDownloaded);
+    });
   }, []);
 
   const refreshVideosDownloaded = async () => {
@@ -41,6 +47,8 @@ const DownloadPage = function (props) {
 
   const onVideoDownloaded = async (videoId, isDownloaded) => {
     let newVideoDownloaded = await videosService.getVideosDownloaded();
+    // console.log({ newVideoDownloaded });
+
     newVideoDownloaded.find((video) => video.id === videoId).isDownloaded = isDownloaded;
     setVideosDownloaded(newVideoDownloaded);
   };

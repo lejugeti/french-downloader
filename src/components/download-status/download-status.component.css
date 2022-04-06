@@ -1,5 +1,6 @@
 .download-status-OK,
-.download-status-ERROR {
+.download-status-ERROR,
+.download-status-not-downloaded {
   display: flex;
   align-items: flex-end;
   font-size: 1.2em;
@@ -12,4 +13,8 @@
 
 .download-status-ERROR {
   color: rgb(185, 8, 8);
+}
+
+.download-status-not-downloaded {
+  color: rgb(48, 47, 47);
 }

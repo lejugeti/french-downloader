@@ -26,11 +26,12 @@ class DownloadQueueService {
     this.isDownloadStarted = downloadStatus;
   }
 
-  startDownload() {
+  async startDownload() {
     console.log("start download");
     if (!this.isDownloadStarted) {
-      this.downloadVideosInQueue();
+      await this.downloadVideosInQueue();
     }
+    console.log("end download");
   }
 
   async downloadVideosInQueue() {
@@ -42,7 +43,7 @@ class DownloadQueueService {
       try {
         socketService.getSocket().emit("download-begin", currentVideo.id, currentVideo.videoId);
         await downloadVideoService.downloadVideo(currentVideo);
-        videoDataService.updateDownloadStatus(currentVideo.id, true);
+        await videoDataService.updateDownloadStatus(currentVideo.id, true);
         socketService.getSocket().emit("download-ended", currentVideo.id, true);
       } catch (codeError) {
         console.error(codeError);

@@ -1,7 +1,9 @@
 const videoDataService = require("../../services/video-data.service");
+const socketService = require("../../services/socket.service");
 
 describe("Video data service", () => {
   beforeAll(() => {
+    var spySocket = jest.spyOn(socketService, "getSocket").mockImplementation(jest.fn());
     var spySaveData = jest.spyOn(videoDataService, "saveData").mockImplementation(jest.fn());
   });
 
@@ -62,5 +64,15 @@ describe("Video data service", () => {
 
     videoDataService.updateErrorStatus(1, true);
     expect(videoDataService.videos[1].error).toBeTruthy();
+  });
+
+  test("videoIsAlreadySaved", () => {
+    videoDataService.videos = [
+      { id: 0, videoId: "videoId0" },
+      { id: 1, videoId: "videoId1" },
+    ];
+
+    expect(videoDataService.videoIsAlreadySaved({ id: 0, videoId: "videoId0" })).toBeTruthy();
+    expect(videoDataService.videoIsAlreadySaved({ id: 1, videoId: "videoId0" })).toBeFalsy();
   });
 });

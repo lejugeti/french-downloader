@@ -16,15 +16,9 @@ const VideoDownload = ({ video, onDownloadVideo, onVideoDownloaded, onDeleteVide
   var _isMounted = true;
   var downloadContext = useContext(DownloadContext);
 
-  useEffect(() => {
-    if (!video.isDownloaded) {
-      downloadContext.socket.on("download-ended", (videoId, isDownloaded) => {
-        if (downloadContext.videoId === video.id) {
-          onVideoDownloaded(videoId, isDownloaded);
-        }
-      });
-    }
-  }, []);
+  // useEffect(() => {
+
+  // }, []);
 
   const handleDownloadVideo = (convertToMusic) => {
     VideosService.downloadVideo(video, convertToMusic)
@@ -64,13 +58,17 @@ const VideoDownload = ({ video, onDownloadVideo, onVideoDownloaded, onDeleteVide
         <span className='video-title'>{video.title}</span>
         <span className='video-channel'>{video.channelTitle}</span>
         <div className='download-informations'>
-          {videoIsDownloading() && (
+          {videoIsDownloading() ? (
             <DownloadProgress
               percentageDownload={downloadContext.percentageDownload}
               timeDownload={downloadContext.timeDownload}
             />
+          ) : (
+            <DownloadStatus downloadDate={video.date} downloadError={video.error} isDownloaded={video.isDownloaded} />
           )}
-          {video.isDownloaded && <DownloadStatus downloadDate={video.date} downloadError={video.error} />}
+          {/* {video.isDownloaded && (
+            <DownloadStatus downloadDate={video.date} downloadError={video.error} isDownloaded={video.isDownloaded} />
+          )} */}
         </div>
 
         <div className='video-buttons'>

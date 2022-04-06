@@ -8,6 +8,7 @@ describe("Download video service", () => {
   beforeAll(() => {
     socketService.createSocket();
 
+    var spySocket = jest.spyOn(socketService, "getSocket").mockImplementation(jest.fn());
     var spyAddVideoWithError = jest.spyOn(videoDataService, "addVideoWithError").mockImplementation(jest.fn());
   });
 
